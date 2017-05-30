@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "Position.h"
 #include "SlalomParams.h"
 
 struct Motion{
@@ -40,6 +41,8 @@ enum class PathType : uint8_t {
 class Path{
 private:
 	std::vector<Motion> path;
+	std::vector< std::pair<float, float> > positions;
+	std::vector<MouseAngle> angles;
 
 	Motion goalmotion;
 
@@ -47,11 +50,18 @@ private:
 
 public:
 	Path(PathType);
+	Path();
 
 	void format();
 
+	int16_t getPathLength();
+
 	Motion getMotion(int16_t num);
 	void putMotion(Motion motion);
+	std::pair<float, float> getPosition(int16_t num);
+	void putPosition(std::pair<float, float> position);
+	MouseAngle getAngle(int16_t num);
+	void putAngle(MouseAngle angle);
 
 	inline bool operator==(const Path& p) const {
 		return path == p.path;

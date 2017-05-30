@@ -164,7 +164,7 @@ bool Map::hasWatched(int8_t x, int8_t y, MazeAngle angle){
 	}
 }
 
-void Map::copyFrom(Map& m){
+void Map::copyFrom(const Map& m){
 	for(int i=0; i<31; i++){
 		column[i] = m.column[i];
 		row[i] = m.row[i];

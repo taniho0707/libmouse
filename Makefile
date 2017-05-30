@@ -8,5 +8,5 @@ arm: $(files)
 
 .PHONY: clean
 clean:
-	rm *.o
-	rm *.so
+	rm -f *.o
+	rm -f *.so

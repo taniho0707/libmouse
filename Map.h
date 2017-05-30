@@ -105,7 +105,7 @@ public:
 
 	bool hasWatched(int8_t, int8_t, MazeAngle);
 
-	void copyFrom(Map&);
+	void copyFrom(const Map&);
 
 
 	/**

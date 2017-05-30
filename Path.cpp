@@ -16,17 +16,32 @@ Path::Path(PathType type){
 	format();
 	pathtype = type;
 }
+Path::Path(){
+	goalmotion = (struct Motion) {
+		RunType::PIVOTTURN,
+		1,
+	};
+	format();
+	pathtype = PathType::DIAGO;
+}
+
 
 void Path::format(){
 	std::vector<Motion>().swap(path);
 	return;
 }
 
+int16_t Path::getPathLength(){
+	return path.size();
+}
+
+
 Motion Path::getMotion(int16_t num){
 	if(num < 0) return goalmotion;
 	if(path.size() <= num) return goalmotion;
 	else return path.at(num);
 }
+
 
 void Path::putMotion(Motion motion){
 	/// @todo 圧縮各種に対応させる
@@ -266,6 +281,25 @@ void Path::putMotion(Motion motion){
 			}
 		}
 	}
-	return;
+
+	/// @todo anglesとpositionsを更新する
+	
+}
+
+
+pair<float, float> Path::getPosition(int16_t num){
+	return positions.at(num);
+}
+
+void Path::putPosition(std::pair<float, float> position){
+	positions.push_back(position);
+}
+
+MouseAngle Path::getAngle(int16_t num){
+	return angles.at(num);
+}
+
+void Path::putAngle(MouseAngle angle){
+	angles.push_back(angle);
 }
 
