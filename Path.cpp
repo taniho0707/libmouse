@@ -26,6 +26,11 @@ Path::Path(){
 }
 
 
+float Path::rad(float p){
+	return 0.017444444*p;
+}
+
+
 void Path::format(){
 	std::vector<Motion>().swap(path);
 	return;
@@ -281,9 +286,29 @@ void Path::putMotion(Motion motion){
 			}
 		}
 	}
+}
 
-	/// @todo anglesとpositionsを更新する
-	
+void Path::updatePositions(){
+	vector< pair<float, float> >().swap(positions);
+	vector<float>().swap(angles);
+	/// @todo ハーフ以外のサイズにも対応させる
+	positions.push_back(pair<float, float>(45, 45));
+	angles.push_back(0.0f);
+	for (int i=0; i<path.size(); ++i) {
+		pair<float, float> lastpos = positions.at(i);
+		float lastx = lastpos.first;
+		float lasty = lastpos.second;
+		float lastangle = angles.at(i);
+		Motion currentmotion = path.at(i);
+		slalomparams::RunType currenttype = currentmotion.type;
+		float diffx = slalomparams::param_vectors.at(static_cast<uint16_t>(currenttype)).x;
+		float diffy = slalomparams::param_vectors.at(static_cast<uint16_t>(currenttype)).y;
+		float diffangle = slalomparams::param_vectors.at(static_cast<uint16_t>(currenttype)).angle;
+
+		/// @todo putPosition, putAngleを使う
+		positions.push_back(pair<float, float>((lastx+(diffx*cos(rad(lastangle))+diffy*sin(rad(lastangle))))*(currentmotion.length), (lasty+(diffy*cos(rad(lastangle))-diffx*sin(rad(lastangle))))*(currentmotion.length)));
+		angles.push_back(lastangle+diffangle);
+	}
 }
 
 
@@ -295,11 +320,11 @@ void Path::putPosition(std::pair<float, float> position){
 	positions.push_back(position);
 }
 
-MouseAngle Path::getAngle(int16_t num){
+float Path::getAngle(int16_t num){
 	return angles.at(num);
 }
 
-void Path::putAngle(MouseAngle angle){
+void Path::putAngle(float angle){
 	angles.push_back(angle);
 }
 

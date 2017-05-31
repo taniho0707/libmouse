@@ -4,6 +4,7 @@
 #pragma once
 
 #include <vector>
+#include <cmath>
 
 #include "Position.h"
 #include "SlalomParams.h"
@@ -42,7 +43,7 @@ class Path{
 private:
 	std::vector<Motion> path;
 	std::vector< std::pair<float, float> > positions;
-	std::vector<MouseAngle> angles;
+	std::vector<float> angles;
 
 	Motion goalmotion;
 
@@ -52,6 +53,9 @@ public:
 	Path(PathType);
 	Path();
 
+	/// @todo 分離したい
+	float rad(float p);
+
 	void format();
 
 	int16_t getPathLength();
@@ -60,8 +64,10 @@ public:
 	void putMotion(Motion motion);
 	std::pair<float, float> getPosition(int16_t num);
 	void putPosition(std::pair<float, float> position);
-	MouseAngle getAngle(int16_t num);
-	void putAngle(MouseAngle angle);
+	float getAngle(int16_t num);
+	void putAngle(float angle);
+
+	void updatePositions();
 
 	inline bool operator==(const Path& p) const {
 		return path == p.path;
