@@ -37,7 +37,7 @@ void Path::format(){
 }
 
 int16_t Path::getPathLength(){
-	return path.size();
+	return path.size()-2;
 }
 
 
@@ -294,7 +294,7 @@ void Path::updatePositions(){
 	/// @todo ハーフ以外のサイズにも対応させる
 	positions.push_back(pair<float, float>(45, 45));
 	angles.push_back(0.0f);
-	for (int i=0; i<path.size() - 2; ++i) {
+	for (int i=0; i<path.size(); ++i) {
 		pair<float, float> lastpos = positions.at(i);
 		float lastx = lastpos.first;
 		float lasty = lastpos.second;
@@ -313,10 +313,6 @@ void Path::updatePositions(){
 								));
 		angles.push_back(lastangle+diffangle);
 	}
-	positions.push_back(pair<float, float>(0, 0));
-	positions.push_back(pair<float, float>(0, 0));
-	angles.push_back(0);
-	angles.push_back(0);
 }
 
 

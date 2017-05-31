@@ -54,7 +54,7 @@ namespace slalomparams{
 		/* 15 */ { -63.639610307f, 63.639610307f,   90.0f }, // SLALOM90OBL_LEFT
 		/* 16 */ {   0.0f, 45.0f,    0.0f }, // TRAPACCEL
 		/* 17 */ {   0.0f,  0.0f,  180.0f }, // PIVOTTURN
-		/* 18 */ {   0.0f, 31.819805153f, 0.0f } // TRAPDIAGO
+		/* 18 */ {   0.0f, 63.639610307f, 0.0f } // TRAPDIAGO
 		}};
 
 	struct pack{
