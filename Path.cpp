@@ -294,7 +294,7 @@ void Path::updatePositions(){
 	/// @todo ハーフ以外のサイズにも対応させる
 	positions.push_back(pair<float, float>(45, 45));
 	angles.push_back(0.0f);
-	for (int i=0; i<path.size(); ++i) {
+	for (int i=0; i<path.size() - 2; ++i) {
 		pair<float, float> lastpos = positions.at(i);
 		float lastx = lastpos.first;
 		float lasty = lastpos.second;
@@ -305,10 +305,18 @@ void Path::updatePositions(){
 		float diffy = slalomparams::param_vectors.at(static_cast<uint16_t>(currenttype)).y;
 		float diffangle = slalomparams::param_vectors.at(static_cast<uint16_t>(currenttype)).angle;
 
+		if (i == 0 && currentmotion.type == RunType::TRAPACCEL) --currentmotion.length;
 		/// @todo putPosition, putAngleを使う
-		positions.push_back(pair<float, float>((lastx+(diffx*cos(rad(lastangle))+diffy*sin(rad(lastangle))))*(currentmotion.length), (lasty+(diffy*cos(rad(lastangle))-diffx*sin(rad(lastangle))))*(currentmotion.length)));
+		positions.push_back(pair<float, float>(
+								(lastx+ (diffx*cos(rad(lastangle))-diffy*sin(rad(lastangle)))*currentmotion.length),
+								(lasty+ (diffy*cos(rad(lastangle))+diffx*sin(rad(lastangle)))*currentmotion.length)
+								));
 		angles.push_back(lastangle+diffangle);
 	}
+	positions.push_back(pair<float, float>(0, 0));
+	positions.push_back(pair<float, float>(0, 0));
+	angles.push_back(0);
+	angles.push_back(0);
 }
 
 
