@@ -4,7 +4,40 @@
 
 #include "Position.h"
 
+using namespace std;
 using namespace slalomparams;
+
+
+MultiplePosition::MultiplePosition(std::vector< std::pair<int16_t, int16_t> > cur){
+	curs = cur;
+}
+MultiplePosition::MultiplePosition(){
+	
+}
+MultiplePosition::~MultiplePosition(){
+	
+}
+
+void MultiplePosition::clear(){
+	vector< pair<int16_t, int16_t> >().swap(curs);
+}
+
+void MultiplePosition::add(int16_t x, int16_t y){
+	curs.push_back({x, y});
+}
+
+uint8_t MultiplePosition::size(){
+	return curs.size();
+}
+
+bool MultiplePosition::isInclude(pair<int16_t, int16_t> cur){
+	for (auto ite : curs) {
+		if (ite.first == cur.first && ite.second == cur.second)
+			return true;
+	}
+	return false;
+}
+
 
 Position::Position(){
 	cur_x = 0;

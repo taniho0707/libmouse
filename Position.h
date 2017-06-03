@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "SlalomParams.h"
 
 enum class MazeAngle : uint8_t{
@@ -18,6 +20,20 @@ enum class MouseAngle : uint8_t{
 	RIGHT,
 	BACK,
 	LEFT,
+};
+
+class MultiplePosition {
+public:
+	std::vector< std::pair<int16_t, int16_t> > curs;
+
+	void clear();
+	bool isInclude(std::pair<int16_t, int16_t> cur);
+	void add(int16_t x, int16_t y);
+	uint8_t size();
+
+	MultiplePosition();
+	MultiplePosition(std::vector< std::pair<int16_t, int16_t> >);
+	~MultiplePosition();
 };
 
 class Position{

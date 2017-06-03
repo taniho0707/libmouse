@@ -5,10 +5,20 @@
 
 #include "SlalomParams.h"
 #include "Walldata.h"
+#include "Position.h"
+
+enum class ClassType : uint8_t {
+	CLASSIC,
+	HALF,
+	QUARTER,
+};
 
 class Map{
 private:
-	
+	/**
+	 * @brief 迷路の競技を指定
+	 */
+	ClassType type;
 	
 public:
 	Map();
@@ -26,6 +36,11 @@ public:
 	 */
 	uint32_t reached[32];
 
+	/**
+	 * @brief ゴール座標を指定
+	 */
+	MultiplePosition goals;
+
 
 	void format();
 	/**
@@ -36,6 +51,11 @@ public:
 	 * @brief 到達マップを初期化する
 	 */
 	void formatReached();
+
+	void setType(ClassType newtype);
+	ClassType getType();
+
+	void addGoals(int16_t x, int16_t y);
 
 
 	/**
