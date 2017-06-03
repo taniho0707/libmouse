@@ -20,10 +20,10 @@ void Map::format(){
 	formatReached();
 	setType(ClassType::HALF);
 	goals.clear();
-	addGoals(7, 7);
-	addGoals(7, 8);
-	addGoals(8, 7);
-	addGoals(8, 8);
+	addGoal(7, 7);
+	addGoal(7, 8);
+	addGoal(8, 7);
+	addGoal(8, 8);
 }
 
 void Map::formatWall(){
@@ -48,7 +48,7 @@ ClassType Map::getType(){
 	return type;
 }
 
-void Map::addGoals(int16_t x, int16_t y){
+void Map::addGoal(int16_t x, int16_t y){
 	goals.add(x, y);
 }
 

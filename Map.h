@@ -55,7 +55,7 @@ public:
 	void setType(ClassType newtype);
 	ClassType getType();
 
-	void addGoals(int16_t x, int16_t y);
+	void addGoal(int16_t x, int16_t y);
 
 
 	/**
