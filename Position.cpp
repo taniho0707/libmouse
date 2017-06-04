@@ -23,7 +23,8 @@ void MultiplePosition::clear(){
 }
 
 void MultiplePosition::add(int16_t x, int16_t y){
-	curs.push_back({x, y});
+	pair<int16_t, int16_t> tmp(x, y);
+	curs.push_back(tmp);
 }
 
 uint8_t MultiplePosition::size(){
