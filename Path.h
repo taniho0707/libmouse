@@ -63,6 +63,11 @@ public:
 	Motion getMotion(int16_t num);
 	void putMotion(Motion motion);
 	std::pair<float, float> getPosition(int16_t num);
+
+	/// @todo 斜めの前後の座標は信用できない
+	std::pair<int8_t, int8_t> getPositionCoordinate(int16_t num);
+	MazeAngle getAngleCoordinate(int16_t num);
+
 	void putPosition(std::pair<float, float> position);
 	float getAngle(int16_t num);
 	void putAngle(float angle);

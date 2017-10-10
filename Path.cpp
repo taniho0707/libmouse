@@ -320,12 +320,21 @@ pair<float, float> Path::getPosition(int16_t num){
 	return positions.at(num);
 }
 
+std::pair<int8_t, int8_t> Path::getPositionCoordinate(int16_t num){
+	pair<float, float> pos = getPosition(num);
+	return make_pair((pos.first/90.0f), (pos.second/90.0f));
+}
+
 void Path::putPosition(std::pair<float, float> position){
 	positions.push_back(position);
 }
 
 float Path::getAngle(int16_t num){
 	return angles.at(num);
+}
+
+MazeAngle Path::getAngleCoordinate(int16_t num){
+	return static_cast<MazeAngle>((4-static_cast<int8_t>(floor((getAngle(num)+360.0f+45.0f)/90.0f)))%4);
 }
 
 void Path::putAngle(float angle){

@@ -148,6 +148,19 @@ bool Map::isExistWall(int8_t x, int8_t y, MazeAngle angle){
 	else return false;
 }
 
+bool Map::isExistWallFromMouse(int8_t x, int8_t y, MazeAngle angle, int8_t mousex, int8_t mousey, MazeAngle mouseangle){
+	if (mouseangle == MazeAngle::NORTH) {
+		return isExistWall(x+mousex, y+mousey, angle);
+	} else if (mouseangle == MazeAngle::EAST) {
+		return isExistWall(x+mousey, y-mousex, static_cast<MazeAngle>((static_cast<uint8_t>(angle)+1)%4));
+	} else if (mouseangle == MazeAngle::SOUTH) {
+		return isExistWall(x-mousex, y-mousey, static_cast<MazeAngle>((static_cast<uint8_t>(angle)+2)%4));
+	} else { // WEST
+		return isExistWall(x-mousey, y+mousex, static_cast<MazeAngle>((static_cast<uint8_t>(angle)+3)%4));
+	}
+}
+
+
 void Map::setReached(int8_t x, int8_t y){
 	if(x > 31 || x < 0 || y > 31 || y < 0) return;
 	reached[y] |= (0x80000000 >> x);

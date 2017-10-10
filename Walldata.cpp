@@ -61,20 +61,20 @@ Walldata Walldata::rotateWallToRelative(Walldata wall, MazeAngle angle){
 	Walldata ret;
 	if(angle == MazeAngle::NORTH) return wall;
 	else if(angle == MazeAngle::EAST){
-		if(wall.isExistWall(MouseAngle::FRONT)) ret.addWall(MouseAngle::RIGHT);
-		if(wall.isExistWall(MouseAngle::RIGHT)) ret.addWall(MouseAngle::BACK);
-		if(wall.isExistWall(MouseAngle::BACK)) ret.addWall(MouseAngle::LEFT);
-		if(wall.isExistWall(MouseAngle::LEFT)) ret.addWall(MouseAngle::FRONT);
+		if(wall.isExistWall(MouseAngle::FRONT)) ret.addWall(MouseAngle::LEFT);
+		if(wall.isExistWall(MouseAngle::RIGHT)) ret.addWall(MouseAngle::FRONT);
+		if(wall.isExistWall(MouseAngle::BACK)) ret.addWall(MouseAngle::RIGHT);
+		if(wall.isExistWall(MouseAngle::LEFT)) ret.addWall(MouseAngle::BACK);
 	} else if(angle == MazeAngle::SOUTH){
 		if(wall.isExistWall(MouseAngle::FRONT)) ret.addWall(MouseAngle::BACK);
 		if(wall.isExistWall(MouseAngle::RIGHT)) ret.addWall(MouseAngle::LEFT);
 		if(wall.isExistWall(MouseAngle::BACK)) ret.addWall(MouseAngle::FRONT);
 		if(wall.isExistWall(MouseAngle::LEFT)) ret.addWall(MouseAngle::RIGHT);
 	} else {
-		if(wall.isExistWall(MouseAngle::FRONT)) ret.addWall(MouseAngle::LEFT);
-		if(wall.isExistWall(MouseAngle::RIGHT)) ret.addWall(MouseAngle::FRONT);
-		if(wall.isExistWall(MouseAngle::BACK)) ret.addWall(MouseAngle::RIGHT);
-		if(wall.isExistWall(MouseAngle::LEFT)) ret.addWall(MouseAngle::BACK);
+		if(wall.isExistWall(MouseAngle::FRONT)) ret.addWall(MouseAngle::RIGHT);
+		if(wall.isExistWall(MouseAngle::RIGHT)) ret.addWall(MouseAngle::BACK);
+		if(wall.isExistWall(MouseAngle::BACK)) ret.addWall(MouseAngle::LEFT);
+		if(wall.isExistWall(MouseAngle::LEFT)) ret.addWall(MouseAngle::FRONT);
 	}
 	return ret;
 }

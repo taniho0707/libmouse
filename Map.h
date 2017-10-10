@@ -106,6 +106,19 @@ public:
 	 * @return 壁が存在したらtrue
 	 */
 	bool isExistWall(int8_t x, int8_t y, MazeAngle angle);
+	
+	/**
+	 * @brief マウスから見て壁があるか確認します
+	 * @param x マウスからのx座標
+	 * @param y マウスからのy座標
+	 * @param angle マウスから見た壁の方角
+	 * @param mousex マウスのx座標
+	 * @param mousey マウスのy座標
+	 * @param mouseangle マウスの方角
+	 * @return 壁が存在したらtrue
+	 */
+	bool isExistWallFromMouse(int8_t x, int8_t y, MazeAngle angle,
+							  int8_t mousex, int8_t mousey, MazeAngle mouseangle);
 
 
 	/**
