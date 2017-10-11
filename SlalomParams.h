@@ -57,7 +57,7 @@ namespace slalomparams{
 		/* 18 */ {   0.0f, 63.639610307f, 0.0f } // TRAPDIAGO
 		}};
 
-	struct pack{
+	struct pack {
 		float d_before;
 		float d_after;
 		float acc_rad;
@@ -68,10 +68,17 @@ namespace slalomparams{
 		float min_vel;
 		float acc_lin;
 	};
-
 	typedef struct pack pack_t;
 
 	using namespace std;
 
 	array< map<float,pack_t>* , 16> getParams();
+
+	/// @todo acc_downはまだ未対応
+	struct paramset {
+		float acc_up;
+		float acc_down;
+		array<float, 19> vels;
+	};
+	typedef struct paramset paramset_t;
 }

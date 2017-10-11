@@ -315,6 +315,78 @@ void Path::updatePositions(){
 	}
 }
 
+uint32_t Path::getFullTime(){
+	paramset_t params;
+	params.acc_up = 3.0f;
+	params.acc_down = 3.0f;
+	array<float, 19> vels {
+		0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.3f,
+			0.5f,
+			0.0f,
+			0.5f
+			};
+	params.vels = vels;
+
+	uint32_t totaltime = 0;
+	for (int i=0; i<path.size(); ++i) {
+		if (path.at(i).type == RunType::TRAPACCEL || path.at(i).type == RunType::TRAPDIAGO) {
+			float reg_accel = params.acc_up;
+			float reg_max_vel = params.vels.at(static_cast<uint8_t>(path.at(i).type));
+			float reg_start_vel = params.vels.at(i==0 ? 0.0f : (static_cast<uint8_t>(path.at(i-1).type)));
+			float reg_end_vel = params.vels.at(i==path.size()-1 ? 0.0f : (static_cast<uint8_t>(path.at(i+1).type)));
+			float reg_distance = path.at(i).length * 0.045f;
+			float pi = 3.141592659f;
+			float x_ad = pi/2.0f/reg_accel*(reg_max_vel*reg_max_vel-reg_end_vel*reg_end_vel/2.0f-reg_start_vel*reg_start_vel/2.0f);
+			if(x_ad > abs(reg_distance)){
+				reg_max_vel = sqrt(2.0f*reg_accel*abs(reg_distance)/pi+(reg_start_vel*reg_start_vel+reg_end_vel*reg_end_vel)/2.0f);
+				float x1 = ((reg_max_vel*reg_max_vel-reg_start_vel*reg_start_vel)*pi/4.0f/reg_accel);
+				float x2 = 0.0f;
+				float x3 = ((reg_max_vel*reg_max_vel-reg_end_vel*reg_end_vel)*pi/4.0f/reg_accel);
+				uint32_t t1 = static_cast<int32_t>(pi*(reg_max_vel-reg_start_vel)/2.0f/reg_accel*1000.0f);
+				uint32_t t3 = static_cast<int32_t>(pi*(reg_max_vel-reg_end_vel)/2.0f/reg_accel*1000.0f);
+				uint32_t t2 = 0;
+				totaltime += (t1 + t2 + t3);
+			} else {
+				float x1 = ((reg_max_vel*reg_max_vel-reg_start_vel*reg_start_vel)*pi/4.0f/reg_accel);
+				float x3 = ((reg_max_vel*reg_max_vel-reg_end_vel*reg_end_vel)*pi/4.0f/reg_accel);
+				float x2 = abs(reg_distance) - x1 - x3;
+				uint32_t t1 = static_cast<int32_t>(pi*(reg_max_vel-reg_start_vel)/2.0f/reg_accel*1000.0f);
+				uint32_t t3 = static_cast<int32_t>(pi*(reg_max_vel-reg_end_vel)/2.0f/reg_accel*1000.0f);
+				uint32_t t2 = static_cast<int32_t>(1000.0f * x2 / reg_max_vel);
+				totaltime += (t1 + t2 + t3);
+			}
+		} else if (path.at(i).type == RunType::PIVOTTURN) {
+			// return 0;
+		} else {
+			auto it = slalomparams::getParams().at(static_cast<uint16_t>(path.at(i).type))->find(params.vels.at(static_cast<uint8_t>(path.at(i).type)));
+			if(it == slalomparams::getParams().at(static_cast<uint16_t>(path.at(i).type))->end()) return 0;
+			float reg_distance = it->second.deg;
+			float const_deg = it->second.const_deg;
+			float reg_accel = it->second.acc_rad;
+			float t1 = 1000.0f * sqrt(2.0f * (reg_distance-const_deg) / 2.0f / reg_accel);
+			float t2 = 1000.0f * const_deg / (reg_accel * t1 / 1000.0f) + t1;
+			float t3 = t1 + t2 - 1;
+			totaltime += t3;
+		}
+	}
+	return totaltime;
+}
+
 
 pair<float, float> Path::getPosition(int16_t num){
 	return positions.at(num);

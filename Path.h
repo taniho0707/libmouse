@@ -74,6 +74,8 @@ public:
 
 	void updatePositions();
 
+	uint32_t getFullTime();
+
 	inline bool operator==(const Path& p) const {
 		return path == p.path;
 	}
