@@ -16,15 +16,20 @@
 
 class Graph{
 private:
-	uint16_t cnvCoordinateToNum(int16_t x, int16_t y, MazeAngle angle);
-	void cnvNumToCoordinate(uint16_t num, int16_t& x, int16_t& y, MazeAngle& angle);
-
+	const uint16_t WEIGHT_STRAIGHT;
+	const uint16_t WEIGHT_DIAGO;
+	
 public:
 	std::vector<Node> nodes;
 
 	Graph();
 	Graph(uint16_t num);
 	~Graph();
+
+	static uint16_t cnvCoordinateToNum(int16_t x, int16_t y, MazeAngle angle);
+	static void cnvNumToCoordinate(uint16_t num, int16_t& x, int16_t& y, MazeAngle& angle);
+
+	void connectWithMap(Map& map);
 
 	void connectNodes(uint16_t node1, uint16_t node2, uint16_t weight);
 	void connectNodes(int16_t from_x, int16_t from_y, MazeAngle from_angle,

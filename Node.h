@@ -20,8 +20,9 @@ public:
 	bool done; // 確定ノードか否か
 	uint16_t cost; // このノードへの現時点で判明している最小コスト
 	uint16_t from; // このノードへ接続したノード番号
+	uint16_t num; // このノードの番号
 
-	Node();
+	Node(uint16_t n);
 	
 	/* std::vector<uint16_t> getConnectedNodes(); */
 	/* bool isConnected(uint16_t num); */

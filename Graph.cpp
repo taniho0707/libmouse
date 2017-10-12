@@ -2,18 +2,22 @@
 
 using namespace std;
 
-Graph::Graph(){
+Graph::Graph() :
+	WEIGHT_STRAIGHT(90),
+	WEIGHT_DIAGO(63)
+{
 	nodes.reserve(1984+2);
-	Node node;
 	for (int i=0; i<(1984+2); ++i) {
-		nodes.push_back(node);
+		nodes.push_back(Node(i));
 	}
 }
-Graph::Graph(uint16_t num){
+Graph::Graph(uint16_t num) :
+	WEIGHT_STRAIGHT(90),
+	WEIGHT_DIAGO(63)
+{
 	nodes.reserve(num);
-	Node node;
 	for (int i=0; i<num; ++i) {
-		nodes.push_back(node);
+		nodes.push_back(Node(i));
 	}
 }
 
@@ -23,6 +27,13 @@ Graph::~Graph(){}
 /// @todo 範囲外アクセスしないようにあれこれする
 uint16_t Graph::cnvCoordinateToNum(int16_t x, int16_t y, MazeAngle angle){
 	if (x == 0 && y == 0 && angle == MazeAngle::SOUTH) return 1984;
+	if (x > 31 || x < 0 || y > 31 || y < 0
+		|| (angle == MazeAngle::NORTH && x == 31)
+		|| (angle == MazeAngle::EAST && y == 31)
+		) {
+		return 1985;
+	}
+
 	if (angle == MazeAngle::SOUTH) return cnvCoordinateToNum(x, y-1, MazeAngle::NORTH);
 	else if (angle == MazeAngle::WEST) return cnvCoordinateToNum(x-1, y, MazeAngle::EAST);
 	else if (angle == MazeAngle::NORTH) return 63*x + y*2 + 1;
@@ -65,6 +76,27 @@ uint16_t Graph::getCost(int16_t x, int16_t y, MazeAngle angle){
 }
 
 
+void Graph::connectWithMap(Map& map){
+	connectNodes(0, 0, MazeAngle::SOUTH, 0, 0, MazeAngle::NORTH, WEIGHT_STRAIGHT);
+	for (int i=0; i<31; ++i) {
+		for (int j=0; j<31; ++j) {
+			if (!map.isExistWall(i, j, MazeAngle::NORTH)) {
+				if (!map.isExistWall(i, j+1, MazeAngle::EAST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::EAST, WEIGHT_DIAGO);
+				if (!map.isExistWall(i, j+1, MazeAngle::NORTH)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::NORTH, WEIGHT_STRAIGHT);
+				if (!map.isExistWall(i, j+1, MazeAngle::WEST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::WEST, WEIGHT_DIAGO);
+			}
+		}
+	}
+	for (int i=0; i<30; ++i) {
+		for (int j=0; j<32; ++j) {
+			if (!map.isExistWall(i, j, MazeAngle::EAST)) {
+				if (!map.isExistWall(i+1, j, MazeAngle::EAST)) connectNodes(i, j, MazeAngle::EAST, i+1, j, MazeAngle::EAST, WEIGHT_STRAIGHT);
+			}
+		}
+	}
+}
+
+
 vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 	auto comparator = [](Node* left, Node* right){
 		return left->cost < right->cost;
@@ -82,10 +114,22 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 		for (uint16_t i=0; i<node_done->edges_to.size()-1; ++i) {
 			uint16_t to = node_done->edges_to.at(i);
 			uint16_t cost = node_done->edges_cost.at(i);
+			uint16_t from = node_done->num;
 			if (nodes.at(to).cost == Node::MAX || cost < nodes.at(to).cost) {
 				nodes.at(to).cost = cost;
+				nodes.at(to).from = from;
 				q.push(&nodes.at(to));
 			}
 		}
 	}
+
+	vector<uint16_t> ret;
+	// Node* node_ret;
+	// node_ret = &nodes.at(end);
+	// // while(node_ret->cost != 0) {
+	// 	ret.push_back(node_ret->num);
+	// 	node_ret = &nodes.at(node_ret->from);
+	// // }
+	ret.push_back(nodes.at(end).cost);
+	return ret;
 }

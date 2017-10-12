@@ -1,8 +1,9 @@
 #include "Node.h"
 
-Node::Node(){
+Node::Node(uint16_t n){
 	done = false;
 	cost = MAX;
+	num = n;
 }
 
 Node::~Node(){}
