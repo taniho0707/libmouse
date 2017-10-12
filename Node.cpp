@@ -1,25 +1,41 @@
 #include "Node.h"
 
-Node::Node(uint16_t n){
-	num = n;
+Node::Node(){
 	done = false;
 	cost = MAX;
 }
 
 Node::~Node(){}
 
-std::vector<Node *> getConnectedNodes(){
+// std::vector<uint16_t> getConnectedNodes(){
 	
+// }
+
+// bool Node::isConnected(uint16_t num){
+	
+// }
+
+// uint16_t Node::getCost(uint16_t num){
+	
+// }
+
+bool Node::operator< (const Node& input) const{
+	if (cost < input.cost) return true;
+	else return false;
 }
 
-bool isConnectedNode(Node&){
-	
+bool Node::operator> (const Node& input) const{
+	if (cost > input.cost) return true;
+	else return false;
 }
 
-uint16_t getCost(Node *){
-	
+bool Node::operator< (const Node* input) const{
+	if (cost < input->cost) return true;
+	else return false;
 }
 
-uint16_t getNumber(){
-	
+bool Node::operator> (const Node* input) const{
+	if (cost > input->cost) return true;
+	else return false;
 }
+
