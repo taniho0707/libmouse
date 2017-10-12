@@ -41,6 +41,11 @@ uint16_t Graph::cnvCoordinateToNum(int16_t x, int16_t y, MazeAngle angle){
 }
 
 void Graph::cnvNumToCoordinate(uint16_t num, int16_t& x, int16_t& y, MazeAngle& angle){
+	if (num == 1984) {
+		x = 0; y = 0; angle = MazeAngle::SOUTH;
+		return;
+	}
+
 	x = num/63;
 	if ((num%63)%2 == 0) {
 		angle = MazeAngle::EAST;
@@ -84,6 +89,8 @@ void Graph::connectWithMap(Map& map){
 				if (!map.isExistWall(i, j+1, MazeAngle::EAST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::EAST, WEIGHT_DIAGO);
 				if (!map.isExistWall(i, j+1, MazeAngle::NORTH)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::NORTH, WEIGHT_STRAIGHT);
 				if (!map.isExistWall(i, j+1, MazeAngle::WEST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::WEST, WEIGHT_DIAGO);
+				if (!map.isExistWall(i, j, MazeAngle::EAST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::EAST, WEIGHT_DIAGO);
+				if (!map.isExistWall(i, j, MazeAngle::WEST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::WEST, WEIGHT_DIAGO);
 			}
 		}
 	}
@@ -111,9 +118,9 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 		if (node_done->done) continue;
 		node_done->done = true;
 		
-		for (uint16_t i=0; i<node_done->edges_to.size()-1; ++i) {
+		for (uint16_t i=0; i<node_done->edges_to.size(); ++i) {
 			uint16_t to = node_done->edges_to.at(i);
-			uint16_t cost = node_done->edges_cost.at(i);
+			uint16_t cost = node_done->edges_cost.at(i) + node_done->cost;
 			uint16_t from = node_done->num;
 			if (nodes.at(to).cost == Node::MAX || cost < nodes.at(to).cost) {
 				nodes.at(to).cost = cost;
@@ -124,12 +131,11 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 	}
 
 	vector<uint16_t> ret;
-	// Node* node_ret;
-	// node_ret = &nodes.at(end);
-	// // while(node_ret->cost != 0) {
-	// 	ret.push_back(node_ret->num);
-	// 	node_ret = &nodes.at(node_ret->from);
-	// // }
-	ret.push_back(nodes.at(end).cost);
+	Node* node_ret;
+	node_ret = &nodes.at(end);
+	while(node_ret->cost != 0) {
+		ret.push_back(node_ret->num);
+		node_ret = &nodes.at(node_ret->from);
+	}
 	return ret;
 }
