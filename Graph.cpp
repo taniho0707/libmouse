@@ -86,18 +86,18 @@ void Graph::connectWithMap(Map& map){
 	for (int i=0; i<31; ++i) {
 		for (int j=0; j<31; ++j) {
 			if (!map.isExistWall(i, j, MazeAngle::NORTH)) {
-				if (!map.isExistWall(i, j+1, MazeAngle::EAST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::EAST, WEIGHT_DIAGO);
-				if (!map.isExistWall(i, j+1, MazeAngle::NORTH)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::NORTH, WEIGHT_STRAIGHT);
-				if (!map.isExistWall(i, j+1, MazeAngle::WEST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::WEST, WEIGHT_DIAGO);
-				if (!map.isExistWall(i, j, MazeAngle::EAST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::EAST, WEIGHT_DIAGO);
-				if (!map.isExistWall(i, j, MazeAngle::WEST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::WEST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j+1, MazeAngle::EAST )) && map.hasWatched(i, j+1, MazeAngle::EAST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::EAST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j+1, MazeAngle::NORTH)) && map.hasWatched(i, j+1, MazeAngle::NORTH)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::NORTH, WEIGHT_STRAIGHT);
+				if ((!map.isExistWall(i, j+1, MazeAngle::WEST )) && map.hasWatched(i, j+1, MazeAngle::WEST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::WEST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j,   MazeAngle::EAST )) && map.hasWatched(i, j  , MazeAngle::EAST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::EAST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j,   MazeAngle::WEST )) && map.hasWatched(i, j  , MazeAngle::WEST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::WEST, WEIGHT_DIAGO);
 			}
 		}
 	}
 	for (int i=0; i<30; ++i) {
 		for (int j=0; j<32; ++j) {
 			if (!map.isExistWall(i, j, MazeAngle::EAST)) {
-				if (!map.isExistWall(i+1, j, MazeAngle::EAST)) connectNodes(i, j, MazeAngle::EAST, i+1, j, MazeAngle::EAST, WEIGHT_STRAIGHT);
+				if ((!map.isExistWall(i+1, j, MazeAngle::EAST)) && map.hasWatched(i+1, j, MazeAngle::EAST)) connectNodes(i, j, MazeAngle::EAST, i+1, j, MazeAngle::EAST, WEIGHT_STRAIGHT);
 			}
 		}
 	}
@@ -122,7 +122,7 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 			uint16_t to = node_done->edges_to.at(i);
 			uint16_t cost = node_done->edges_cost.at(i) + node_done->cost;
 			uint16_t from = node_done->num;
-			if (nodes.at(to).cost == Node::MAX || cost < nodes.at(to).cost) {
+			if (cost < nodes.at(to).cost) {
 				nodes.at(to).cost = cost;
 				nodes.at(to).from = from;
 				q.push(&nodes.at(to));
