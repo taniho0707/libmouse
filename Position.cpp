@@ -45,6 +45,7 @@ Position::Position(){
 	cur_y = 1;
 
 	cur_angle = MazeAngle::NORTH;
+	cur_dir = MouseDirection::NORTH;
 }
 
 Position::~Position(){
@@ -57,6 +58,18 @@ void Position::setPosition(int8_t x, int8_t y){
 }
 void Position::setAngle(MazeAngle angle){
 	cur_angle = angle;
+	if (angle == MazeAngle::NORTH) {
+		cur_dir = MouseDirection::NORTH;
+	} else if (angle == MazeAngle::EAST) {
+		cur_dir = MouseDirection::EAST;
+	} else if (angle == MazeAngle::SOUTH) {
+		cur_dir = MouseDirection::SOUTH;
+	} else if (angle == MazeAngle::WEST) {
+		cur_dir = MouseDirection::WEST;
+	}
+}
+void Position::setAngle(MouseDirection dir){
+	cur_dir = dir;
 }
 void Position::setPosition(int8_t x, int8_t y, MazeAngle angle){
 	setPosition(x, y);
@@ -138,3 +151,21 @@ MazeAngle Position::getAngle(){
 	return cur_angle;
 }
 
+bool Position::isDiago(){
+	if (cur_dir == MouseDirection::NORTHEAST
+		|| cur_dir == MouseDirection::NORTHWEST
+		|| cur_dir == MouseDirection::SOUTHEAST
+		|| cur_dir == MouseDirection::SOUTHWEST
+		){
+		return true;
+	} else {
+		return false;
+	}
+}
+
+MazeAngle Position::cnvMouseDirectionToMazeAngle(MouseDirection dir){
+	return static_cast<MazeAngle>(static_cast<uint8_t>(dir)%2);
+}
+MouseDirection Position::cnvMazeAngleToMouseDirection(MazeAngle angle){
+	return static_cast<MouseDirection>(static_cast<uint8_t>(angle)*2);
+}

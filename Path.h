@@ -66,7 +66,8 @@ public:
 
 	/// @todo 斜めの前後の座標は信用できない
 	std::pair<int8_t, int8_t> getPositionCoordinate(int16_t num);
-	MazeAngle getAngleCoordinate(int16_t num);
+	MousePosition getPositionCoordinateSide(int16_t num);
+	MouseDirection getAngleCoordinate(int16_t num);
 
 	void putPosition(std::pair<float, float> position);
 	float getAngle(int16_t num);
@@ -74,6 +75,7 @@ public:
 
 	void updatePositions();
 
+	/// @todo 速度パラメータが違うと計算できないバグ
 	uint32_t getFullTime();
 
 	inline bool operator==(const Path& p) const {

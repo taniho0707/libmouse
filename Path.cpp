@@ -299,6 +299,7 @@ void Path::updatePositions(){
 		float lastx = lastpos.first;
 		float lasty = lastpos.second;
 		float lastangle = angles.at(i);
+		if (lastangle < 0.0f) lastangle += 360.0f;
 		Motion currentmotion = path.at(i);
 		slalomparams::RunType currenttype = currentmotion.type;
 		float diffx = slalomparams::param_vectors.at(static_cast<uint16_t>(currenttype)).x;
@@ -392,9 +393,26 @@ pair<float, float> Path::getPosition(int16_t num){
 	return positions.at(num);
 }
 
-std::pair<int8_t, int8_t> Path::getPositionCoordinate(int16_t num){
+pair<int8_t, int8_t> Path::getPositionCoordinate(int16_t num){
 	pair<float, float> pos = getPosition(num);
-	return make_pair((pos.first/90.0f), (pos.second/90.0f));
+	pair<int8_t, int8_t> coor;
+	coor.first = static_cast<int8_t>((pos.first-45.0f)/90.0f);
+	coor.second = static_cast<int8_t>((pos.second-45.0f)/90.0f);
+	return coor;
+}
+
+MousePosition Path::getPositionCoordinateSide(int16_t num){
+	int16_t new_x = static_cast<int16_t>(floor(getPosition(num).first - 45.0f));
+	int16_t new_y = static_cast<int16_t>(floor(getPosition(num).second - 45.0f));
+	if (new_x % 90 < 45) {
+		if (new_y % 90 < 45) {
+			return MousePosition::CENTER;
+		} else {
+			return MousePosition::NORTH;
+		}
+	} else {
+		return MousePosition::EAST;
+	}
 }
 
 void Path::putPosition(std::pair<float, float> position){
@@ -405,8 +423,11 @@ float Path::getAngle(int16_t num){
 	return angles.at(num);
 }
 
-MazeAngle Path::getAngleCoordinate(int16_t num){
-	return static_cast<MazeAngle>((4-static_cast<int8_t>(floor((getAngle(num)+360.0f+45.0f)/90.0f)))%4);
+MouseDirection Path::getAngleCoordinate(int16_t num){
+	return static_cast<MouseDirection>(
+		(8- (static_cast<int16_t>(floor(getAngle(num)+360.0f+22.0f)) % 45) ) % 8
+		);
+	// return static_cast<MazeAngle>((4-static_cast<int8_t>(floor((getAngle(num)+360.0f+45.0f)/90.0f)))%4);
 }
 
 void Path::putAngle(float angle){
