@@ -82,25 +82,64 @@ uint16_t Graph::getCost(int16_t x, int16_t y, MazeAngle angle){
 
 
 void Graph::connectWithMap(Map& map){
+	saved_map = map;
+	bool enable_unwatched = true; /// @todo フラグをオンオフできるようにする
 	connectNodes(0, 0, MazeAngle::SOUTH, 0, 0, MazeAngle::NORTH, WEIGHT_STRAIGHT);
 	for (int i=0; i<31; ++i) {
 		for (int j=0; j<31; ++j) {
 			if (!map.isExistWall(i, j, MazeAngle::NORTH)) {
-				if ((!map.isExistWall(i, j+1, MazeAngle::EAST )) && map.hasWatched(i, j+1, MazeAngle::EAST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::EAST, WEIGHT_DIAGO);
-				if ((!map.isExistWall(i, j+1, MazeAngle::NORTH)) && map.hasWatched(i, j+1, MazeAngle::NORTH)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::NORTH, WEIGHT_STRAIGHT);
-				if ((!map.isExistWall(i, j+1, MazeAngle::WEST )) && map.hasWatched(i, j+1, MazeAngle::WEST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::WEST, WEIGHT_DIAGO);
-				if ((!map.isExistWall(i, j,   MazeAngle::EAST )) && map.hasWatched(i, j  , MazeAngle::EAST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::EAST, WEIGHT_DIAGO);
-				if ((!map.isExistWall(i, j,   MazeAngle::WEST )) && map.hasWatched(i, j  , MazeAngle::WEST)) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::WEST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j+1, MazeAngle::EAST )) && (enable_unwatched && map.hasWatched(i, j+1, MazeAngle::EAST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::EAST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j+1, MazeAngle::NORTH)) && (enable_unwatched && map.hasWatched(i, j+1, MazeAngle::NORTH))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::NORTH, WEIGHT_STRAIGHT);
+				if ((!map.isExistWall(i, j+1, MazeAngle::WEST )) && (enable_unwatched && map.hasWatched(i, j+1, MazeAngle::WEST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::WEST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j,   MazeAngle::EAST )) && (enable_unwatched && map.hasWatched(i, j  , MazeAngle::EAST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::EAST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j,   MazeAngle::WEST )) && (enable_unwatched && map.hasWatched(i, j  , MazeAngle::WEST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::WEST, WEIGHT_DIAGO);
 			}
 		}
 	}
 	for (int i=0; i<30; ++i) {
 		for (int j=0; j<32; ++j) {
 			if (!map.isExistWall(i, j, MazeAngle::EAST)) {
-				if ((!map.isExistWall(i+1, j, MazeAngle::EAST)) && map.hasWatched(i+1, j, MazeAngle::EAST)) connectNodes(i, j, MazeAngle::EAST, i+1, j, MazeAngle::EAST, WEIGHT_STRAIGHT);
+				if ((!map.isExistWall(i+1, j, MazeAngle::EAST)) && (enable_unwatched && map.hasWatched(i+1, j, MazeAngle::EAST))) connectNodes(i, j, MazeAngle::EAST, i+1, j, MazeAngle::EAST, WEIGHT_STRAIGHT);
 			}
 		}
 	}
+}
+
+
+Footmap Graph::cnvGraphToFootmap(const vector<uint16_t>& graph){
+	Path path;
+	int16_t x = 0;
+	int16_t y = 0;
+	MazeAngle a = MazeAngle::EAST;
+	Footmap fm;
+	for (int i=graph.size()-1; i>=0; --i) {
+		if (nodes.at(graph.at(i)).cost != 0){
+			Graph::cnvNumToCoordinate(graph.at(i), x, y, a);
+			if (a == MazeAngle::EAST) {
+				fm.setFootmap(x, y, 0);
+				fm.setFootmap(x+1, y, 0);
+			} else { // NORTH
+				fm.setFootmap(x, y, 0);
+				fm.setFootmap(x, y+1, 0);
+			}
+		}
+	}
+	x=6; y=7;
+	for (int i=0; i<1024; ++i) {
+		/// @todo ゴール座標は4か9マス
+		fm.setFootmap(x, y, i);
+		if (x == 0 && y == 0) break;
+		if (fm.getFootmap(x-1, y, 1024) == 0 && (x != 6 || y != 7)){
+			x -= 1;
+		} else if (fm.getFootmap(x+1, y, 1024) == 0 && (x != 6 || y != 7)){
+			x += 1;
+		} else if (fm.getFootmap(x, y-1, 1024) == 0 && (x != 6 || y != 7)){
+			y -= 1;
+		} else if (fm.getFootmap(x, y+1, 1024) == 0 && (x != 6 || y != 7)){
+			y += 1;
+		}
+	}
+	return fm;
 }
 
 
