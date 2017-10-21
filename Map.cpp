@@ -9,10 +9,11 @@ using namespace slalomparams;
 Map::Map(){
 	format();
 	column[0] |= 2147483648;
-	// for(int i=0; i<16; ++i){
-	// 	addSingleWall(15, i, MazeAngle::EAST);
-	// 	addSingleWall(i, 15, MazeAngle::NORTH);
-	// }
+	for(int i=0; i<16; ++i){
+		addSingleWall(15, i, MazeAngle::EAST);
+		addSingleWall(i, 15, MazeAngle::NORTH);
+	}
+	/// @todo 32x32対応させないといけない
 }
 
 void Map::format(){
@@ -20,10 +21,6 @@ void Map::format(){
 	formatReached();
 	setType(ClassType::HALF);
 	goals.clear();
-	addGoal(7, 7);
-	addGoal(7, 8);
-	addGoal(8, 7);
-	addGoal(8, 8);
 }
 
 void Map::formatWall(){
@@ -204,4 +201,6 @@ void Map::copyFrom(const Map& m){
 	for(int i=0; i<32; i++){
 		reached[i] = m.reached[i];
 	}
+	goals = m.goals;
+	type = m.type;
 }

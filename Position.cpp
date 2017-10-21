@@ -27,6 +27,15 @@ void MultiplePosition::add(int16_t x, int16_t y){
 	curs.push_back(tmp);
 }
 
+void MultiplePosition::remove(int16_t x, int16_t y){
+	for (auto ite=curs.begin(); ite!=curs.end(); ++ite) {
+		if (ite->first == x && ite->second == y) {
+			curs.erase(ite);
+			return;
+		}
+	}
+}
+
 uint8_t MultiplePosition::size(){
 	return curs.size();
 }

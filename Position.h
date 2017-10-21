@@ -48,6 +48,7 @@ public:
 	void clear();
 	bool isInclude(std::pair<int16_t, int16_t> cur);
 	void add(int16_t x, int16_t y);
+	void remove(int16_t x, int16_t y);
 	uint8_t size();
 
 	MultiplePosition();

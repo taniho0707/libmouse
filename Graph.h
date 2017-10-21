@@ -17,6 +17,8 @@
 #include "Footmap.h"
 #include "Path.h"
 
+#include "ComPc.h"
+
 class Graph{
 private:
 	const uint16_t WEIGHT_STRAIGHT;
@@ -25,7 +27,7 @@ private:
 	Map saved_map;
 	
 public:
-	std::vector<Node> nodes;
+	std::vector<Node>* nodes;
 
 	Graph();
 	Graph(uint16_t num);
@@ -34,7 +36,7 @@ public:
 	static uint16_t cnvCoordinateToNum(int16_t x, int16_t y, MazeAngle angle);
 	static void cnvNumToCoordinate(uint16_t num, int16_t& x, int16_t& y, MazeAngle& angle);
 
-	void connectWithMap(Map& map);
+	void connectWithMap(Map& map, bool enable_unwatched = false);
 
 	void connectNodes(uint16_t node1, uint16_t node2, uint16_t weight);
 	void connectNodes(int16_t from_x, int16_t from_y, MazeAngle from_angle,

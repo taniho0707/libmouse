@@ -6,22 +6,26 @@ Graph::Graph() :
 	WEIGHT_STRAIGHT(90),
 	WEIGHT_DIAGO(63)
 {
-	nodes.reserve(1984+2);
+	nodes = new std::vector<Node>;
+	nodes->reserve(1984+2);
 	for (int i=0; i<(1984+2); ++i) {
-		nodes.push_back(Node(i));
+		nodes->push_back(Node(i));
 	}
 }
 Graph::Graph(uint16_t num) :
 	WEIGHT_STRAIGHT(90),
 	WEIGHT_DIAGO(63)
 {
-	nodes.reserve(num);
+	nodes = new std::vector<Node>;
+	nodes->reserve(num);
 	for (int i=0; i<num; ++i) {
-		nodes.push_back(Node(i));
+		nodes->push_back(Node(i));
 	}
 }
 
-Graph::~Graph(){}
+Graph::~Graph(){
+	delete nodes;
+}
 
 
 /// @todo 範囲外アクセスしないようにあれこれする
@@ -58,10 +62,11 @@ void Graph::cnvNumToCoordinate(uint16_t num, int16_t& x, int16_t& y, MazeAngle& 
 
 
 void Graph::connectNodes(const uint16_t node1, const uint16_t node2, const uint16_t weight){
-	nodes.at(node1).edges_to.push_back(node2);
-	nodes.at(node1).edges_cost.push_back(weight);
-	nodes.at(node2).edges_to.push_back(node1);
-	nodes.at(node2).edges_cost.push_back(weight);
+	if (node1 >= 1985 || node2 >= 1985) return;
+	nodes->at(node1).edges_to.push_back(node2);
+	nodes->at(node1).edges_cost.push_back(weight);
+	nodes->at(node2).edges_to.push_back(node1);
+	nodes->at(node2).edges_cost.push_back(weight);
 }
 void Graph::connectNodes(int16_t from_x, int16_t from_y, MazeAngle from_angle,
 						 int16_t to_x, int16_t to_y, MazeAngle to_angle,
@@ -77,29 +82,29 @@ void Graph::disconnectNodes(const uint16_t node1, const uint16_t node2){
 
 uint16_t Graph::getCost(int16_t x, int16_t y, MazeAngle angle){
 	uint16_t num = cnvCoordinateToNum(x, y, angle);
-	return nodes.at(num).cost;
+	return nodes->at(num).cost;
 }
 
 
-void Graph::connectWithMap(Map& map){
+void Graph::connectWithMap(Map& map, bool enable_unwatched){
 	saved_map = map;
-	bool enable_unwatched = true; /// @todo フラグをオンオフできるようにする
 	connectNodes(0, 0, MazeAngle::SOUTH, 0, 0, MazeAngle::NORTH, WEIGHT_STRAIGHT);
 	for (int i=0; i<31; ++i) {
 		for (int j=0; j<31; ++j) {
 			if (!map.isExistWall(i, j, MazeAngle::NORTH)) {
-				if ((!map.isExistWall(i, j+1, MazeAngle::EAST )) && (enable_unwatched && map.hasWatched(i, j+1, MazeAngle::EAST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::EAST, WEIGHT_DIAGO);
-				if ((!map.isExistWall(i, j+1, MazeAngle::NORTH)) && (enable_unwatched && map.hasWatched(i, j+1, MazeAngle::NORTH))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::NORTH, WEIGHT_STRAIGHT);
-				if ((!map.isExistWall(i, j+1, MazeAngle::WEST )) && (enable_unwatched && map.hasWatched(i, j+1, MazeAngle::WEST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::WEST, WEIGHT_DIAGO);
-				if ((!map.isExistWall(i, j,   MazeAngle::EAST )) && (enable_unwatched && map.hasWatched(i, j  , MazeAngle::EAST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::EAST, WEIGHT_DIAGO);
-				if ((!map.isExistWall(i, j,   MazeAngle::WEST )) && (enable_unwatched && map.hasWatched(i, j  , MazeAngle::WEST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::WEST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j+1, MazeAngle::EAST )) && (enable_unwatched || map.hasWatched(i, j+1, MazeAngle::EAST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::EAST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j+1, MazeAngle::NORTH)) && (enable_unwatched || map.hasWatched(i, j+1, MazeAngle::NORTH))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::NORTH, WEIGHT_STRAIGHT);
+				if ((!map.isExistWall(i, j+1, MazeAngle::WEST )) && (enable_unwatched || map.hasWatched(i, j+1, MazeAngle::WEST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::WEST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j,   MazeAngle::EAST )) && (enable_unwatched || map.hasWatched(i, j  , MazeAngle::EAST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::EAST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j,   MazeAngle::WEST )) && (enable_unwatched || map.hasWatched(i, j  , MazeAngle::WEST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::WEST, WEIGHT_DIAGO);
+				// ComPc::getInstance()->printf("%d, %d\n", i, j); /// @todo これけしたい
 			}
 		}
 	}
 	for (int i=0; i<30; ++i) {
 		for (int j=0; j<32; ++j) {
 			if (!map.isExistWall(i, j, MazeAngle::EAST)) {
-				if ((!map.isExistWall(i+1, j, MazeAngle::EAST)) && (enable_unwatched && map.hasWatched(i+1, j, MazeAngle::EAST))) connectNodes(i, j, MazeAngle::EAST, i+1, j, MazeAngle::EAST, WEIGHT_STRAIGHT);
+				if ((!map.isExistWall(i+1, j, MazeAngle::EAST)) && (enable_unwatched || map.hasWatched(i+1, j, MazeAngle::EAST))) connectNodes(i, j, MazeAngle::EAST, i+1, j, MazeAngle::EAST, WEIGHT_STRAIGHT);
 			}
 		}
 	}
@@ -113,7 +118,7 @@ Footmap Graph::cnvGraphToFootmap(const vector<uint16_t>& graph){
 	MazeAngle a = MazeAngle::EAST;
 	Footmap fm;
 	for (int i=graph.size()-1; i>=0; --i) {
-		if (nodes.at(graph.at(i)).cost != 0){
+		if (nodes->at(graph.at(i)).cost != 0){
 			Graph::cnvNumToCoordinate(graph.at(i), x, y, a);
 			if (a == MazeAngle::EAST) {
 				fm.setFootmap(x, y, 0);
@@ -149,8 +154,8 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 	};
 	priority_queue<Node*, vector<Node*>, decltype(comparator) > q(comparator);
 
-	nodes.at(start).cost = 0;
-	q.push(&nodes.at(start));
+	nodes->at(start).cost = 0;
+	q.push(&nodes->at(start));
 
 	while (!q.empty()) {
 		Node* node_done = q.top(); q.pop();
@@ -161,20 +166,24 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 			uint16_t to = node_done->edges_to.at(i);
 			uint16_t cost = node_done->edges_cost.at(i) + node_done->cost;
 			uint16_t from = node_done->num;
-			if (cost < nodes.at(to).cost) {
-				nodes.at(to).cost = cost;
-				nodes.at(to).from = from;
-				q.push(&nodes.at(to));
+			if (cost < nodes->at(to).cost) {
+				nodes->at(to).cost = cost;
+				nodes->at(to).from = from;
+				q.push(&nodes->at(to));
 			}
 		}
 	}
 
 	vector<uint16_t> ret;
 	Node* node_ret;
-	node_ret = &nodes.at(end);
-	while(node_ret->cost != 0) {
-		ret.push_back(node_ret->num);
-		node_ret = &nodes.at(node_ret->from);
+	node_ret = &nodes->at(end);
+	{
+		int i=0;
+		while(node_ret->cost != 0 && i++ < 300) { /// @todo 300はてきとう
+			ret.push_back(node_ret->num);
+			node_ret = &nodes->at(node_ret->from);
+		}
 	}
+	
 	return ret;
 }
