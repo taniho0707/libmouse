@@ -14,10 +14,15 @@
 #include "Map.h"
 #include "Position.h"
 
+#include "Footmap.h"
+#include "Path.h"
+
 class Graph{
 private:
 	const uint16_t WEIGHT_STRAIGHT;
 	const uint16_t WEIGHT_DIAGO;
+
+	Map saved_map;
 	
 public:
 	std::vector<Node> nodes;
@@ -39,6 +44,8 @@ public:
 	void disconnectNodes(uint16_t node1, uint16_t node2);
 
 	uint16_t getCost(int16_t x, int16_t y, MazeAngle angle);
+
+	Footmap cnvGraphToFootmap(const std::vector<uint16_t>&);
 
 	// Algorithms
 	std::vector<uint16_t> dijkstra(uint16_t start, uint16_t end);
