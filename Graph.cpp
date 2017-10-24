@@ -128,18 +128,18 @@ Footmap Graph::cnvGraphToFootmap(const vector<uint16_t>& graph){
 			}
 		}
 	}
-	x=6; y=7;
+	x=4; y=4;
 	for (int i=0; i<1024; ++i) {
 		/// @todo ゴール座標は4か9マス
 		fm.setFootmap(x, y, i);
 		if (x == 0 && y == 0) break;
-		if (fm.getFootmap(x-1, y, 1024) == 0 && (x != 6 || y != 7)){
+		if (fm.getFootmap(x-1, y, 1024) == 0 && ((x-1) != 4 || y != 4)){
 			x -= 1;
-		} else if (fm.getFootmap(x+1, y, 1024) == 0 && (x != 6 || y != 7)){
+		} else if (fm.getFootmap(x+1, y, 1024) == 0 && ((x+1) != 4 || y != 4)){
 			x += 1;
-		} else if (fm.getFootmap(x, y-1, 1024) == 0 && (x != 6 || y != 7)){
+		} else if (fm.getFootmap(x, y-1, 1024) == 0 && (x != 4 || (y-1) != 4)){
 			y -= 1;
-		} else if (fm.getFootmap(x, y+1, 1024) == 0 && (x != 6 || y != 7)){
+		} else if (fm.getFootmap(x, y+1, 1024) == 0 && (x != 4 || (y+1) != 4)){
 			y += 1;
 		}
 	}
