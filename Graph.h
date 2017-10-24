@@ -17,8 +17,6 @@
 #include "Footmap.h"
 #include "Path.h"
 
-#include "ComPc.h"
-
 class Graph{
 private:
 	const uint16_t WEIGHT_STRAIGHT;

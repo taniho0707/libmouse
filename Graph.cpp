@@ -97,7 +97,6 @@ void Graph::connectWithMap(Map& map, bool enable_unwatched){
 				if ((!map.isExistWall(i, j+1, MazeAngle::WEST )) && (enable_unwatched || map.hasWatched(i, j+1, MazeAngle::WEST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::WEST, WEIGHT_DIAGO);
 				if ((!map.isExistWall(i, j,   MazeAngle::EAST )) && (enable_unwatched || map.hasWatched(i, j  , MazeAngle::EAST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::EAST, WEIGHT_DIAGO);
 				if ((!map.isExistWall(i, j,   MazeAngle::WEST )) && (enable_unwatched || map.hasWatched(i, j  , MazeAngle::WEST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::WEST, WEIGHT_DIAGO);
-				// ComPc::getInstance()->printf("%d, %d\n", i, j); /// @todo これけしたい
 			}
 		}
 	}
