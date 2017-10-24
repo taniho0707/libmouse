@@ -11,7 +11,7 @@ C_DEFS =  \
 -D__FPU_PRESENT -DARM_MATH_CM4
 C_INCLUDES = 
 CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections \
--fmessage-length=0 -fexceptions -fno-rtti -funsigned-char -fpermissive -fno-use-cxa-atexit -std=c++14 -Wno-narrowing -shared -fPIC
+-fmessage-length=0 -fexceptions -fno-rtti -funsigned-char -fpermissive -fno-use-cxa-atexit -std=c++14 -Wno-narrowing
 
 BINPATH := /usr/bin
 CC := $(BINPATH)/$(PREFIX)g++
@@ -23,12 +23,16 @@ SZ := $(BINPATH)/$(PREFIX)size
 .PHONY: all
 all: $(LIBNAME)
 
-$(LIBNAME): $(wildcard *.cpp)
-	$(CC) $(CFLAGS) $(wildcard *.cpp) -o $(LIBNAME).so
-	$(AR) rcs $(LIBNAME).a $(wildcard *.cpp)
+OBJECTS = $(notdir $(CPP_SOURCES:.cpp=.o))
+vpath %.cpp $(sort $(dir $(wildcard *.cpp)))
+%.o: %.cpp
+	$(CC) $(CFLAGS) $< -c
+
+$(LIBNAME): $(patsubst %.cpp,%.o,$(wildcard *.cpp))
+	$(AR) rcs $(LIBNAME).a $(wildcard *.o)
 
 x86:
-	${MAKE} "CC=g++" "CFLAGS=-Wall -funsigned-char -std=c++14 -shared -fPIC" "LIBNAME=libmouse_x86"
+	${MAKE} "CC=g++" "CFLAGS=-Wall -funsigned-char -std=c++14" "LIBNAME=libmouse_x86"
 
 .PHONY: clean
 clean:
