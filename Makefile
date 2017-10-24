@@ -1,7 +1,7 @@
 SHELL = /bin/sh
 
 PREFIX = arm-none-eabi-
-LIBNAME := libmouse_arm.so
+LIBNAME := libmouse_arm
 CPU = -mcpu=cortex-m4
 FPU = -mfpu=fpv4-sp-d16
 FLOAT-ABI = -mfloat-abi=softfp
@@ -24,10 +24,11 @@ SZ := $(BINPATH)/$(PREFIX)size
 all: $(LIBNAME)
 
 $(LIBNAME): $(wildcard *.cpp)
-	$(CC) $(CFLAGS) $(wildcard *.cpp) -o $(LIBNAME)
+	$(CC) $(CFLAGS) $(wildcard *.cpp) -o $(LIBNAME).so
+	$(AR) rcs $(LIBNAME).a $(wildcard *.cpp)
 
 x86:
-	${MAKE} "CC=g++" "CFLAGS=-Wall -funsigned-char -std=c++14 -shared -fPIC" "LIBNAME=libmouse_x86.so"
+	${MAKE} "CC=g++" "CFLAGS=-Wall -funsigned-char -std=c++14 -shared -fPIC" "LIBNAME=libmouse_x86"
 
 .PHONY: clean
 clean:
