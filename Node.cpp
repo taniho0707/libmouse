@@ -3,6 +3,7 @@
 Node::Node(uint16_t n){
 	done = false;
 	cost = MAX;
+	from = MAX;
 	num = n;
 }
 

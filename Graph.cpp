@@ -82,6 +82,7 @@ void Graph::disconnectNodes(const uint16_t node1, const uint16_t node2){
 
 uint16_t Graph::getCost(int16_t x, int16_t y, MazeAngle angle){
 	uint16_t num = cnvCoordinateToNum(x, y, angle);
+	if (num > 1985) return Node::MAX;
 	return nodes->at(num).cost;
 }
 
@@ -149,7 +150,7 @@ Footmap Graph::cnvGraphToFootmap(const vector<uint16_t>& graph){
 
 vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 	auto comparator = [](Node* left, Node* right){
-		return left->cost < right->cost;
+		return left->cost > right->cost;
 	};
 	priority_queue<Node*, vector<Node*>, decltype(comparator) > q(comparator);
 
@@ -160,7 +161,7 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 		Node* node_done = q.top(); q.pop();
 		if (node_done->done) continue;
 		node_done->done = true;
-		
+
 		for (uint16_t i=0; i<node_done->edges_to.size(); ++i) {
 			uint16_t to = node_done->edges_to.at(i);
 			uint16_t cost = node_done->edges_cost.at(i) + node_done->cost;
@@ -176,7 +177,7 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 	vector<uint16_t> ret;
 	Node* node_ret;
 	node_ret = &nodes->at(end);
-	{
+	if (node_ret->cost != Node::MAX) {
 		int i=0;
 		while(node_ret->cost != 0 && i++ < 300) { /// @todo 300はてきとう
 			ret.push_back(node_ret->num);
