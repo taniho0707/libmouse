@@ -8,6 +8,7 @@ using namespace slalomparams;
 
 Map::Map(){
 	format();
+	enabled_autoinsert = false; /// @todo バグがいるので無効化してる
 	column[0] |= 2147483648;
 	// for(int i=0; i<16; ++i){
 	// 	addSingleWall(15, i, MazeAngle::EAST);
@@ -56,6 +57,34 @@ void Map::addWall(int8_t x, int8_t y, MazeAngle angle, Walldata wall){
 	if(tmp.isExistWall(MouseAngle::LEFT)) addSingleWall(x, y, MazeAngle::WEST);
 	if(tmp.isExistWall(MouseAngle::RIGHT)) addSingleWall(x, y, MazeAngle::EAST);
 	if(tmp.isExistWall(MouseAngle::BACK)) addSingleWall(x, y, MazeAngle::SOUTH);
+	if (enabled_autoinsert) {
+		if (wall.isExistWall(MouseAngle::LEFT) == false) {
+			if (isExistWallFromMouse(x, y, angle, 0, -1, MazeAngle::WEST) == false) {
+				if (angle == MazeAngle::NORTH) {
+					addSingleWall(x-1, y, MazeAngle::SOUTH);
+				} else if (angle == MazeAngle::EAST) {
+					addSingleWall(x, y+1, MazeAngle::WEST);
+				} else if (angle == MazeAngle::SOUTH) {
+					addSingleWall(x+1, y, MazeAngle::NORTH);
+				} else { // WEST
+					addSingleWall(x, y-1, MazeAngle::EAST);
+				}
+			}
+		}
+		if (wall.isExistWall(MouseAngle::RIGHT) == false) {
+			if (isExistWallFromMouse(x, y, angle, 0, -1, MazeAngle::EAST) == false) {
+				if (angle == MazeAngle::NORTH) {
+					addSingleWall(x+1, y, MazeAngle::SOUTH);
+				} else if (angle == MazeAngle::EAST) {
+					addSingleWall(x, y-1, MazeAngle::WEST);
+				} else if (angle == MazeAngle::SOUTH) {
+					addSingleWall(x-1, y, MazeAngle::NORTH);
+				} else { // WEST
+					addSingleWall(x, y+1, MazeAngle::EAST);
+				}
+			}
+		}
+	}
 	return;
 }
 
@@ -65,6 +94,34 @@ void Map::setWall(int8_t x, int8_t y, MazeAngle angle, Walldata wall){
 	setSingleWall(x, y, MazeAngle::EAST,  tmp.isExistWall(MouseAngle::RIGHT));
 	setSingleWall(x, y, MazeAngle::SOUTH, tmp.isExistWall(MouseAngle::BACK));
 	setSingleWall(x, y, MazeAngle::WEST,  tmp.isExistWall(MouseAngle::LEFT));
+	if (enabled_autoinsert) {
+		if (wall.isExistWall(MouseAngle::LEFT) == false) {
+			if (isExistWallFromMouse(x, y, angle, 0, -1, MazeAngle::WEST) == false) {
+				if (angle == MazeAngle::NORTH) {
+					addSingleWall(x-1, y, MazeAngle::SOUTH);
+				} else if (angle == MazeAngle::EAST) {
+					addSingleWall(x, y+1, MazeAngle::WEST);
+				} else if (angle == MazeAngle::SOUTH) {
+					addSingleWall(x+1, y, MazeAngle::NORTH);
+				} else { // WEST
+					addSingleWall(x, y-1, MazeAngle::EAST);
+				}
+			}
+		}
+		if (wall.isExistWall(MouseAngle::RIGHT) == false) {
+			if (isExistWallFromMouse(x, y, angle, 0, -1, MazeAngle::EAST) == false) {
+				if (angle == MazeAngle::NORTH) {
+					addSingleWall(x+1, y, MazeAngle::SOUTH);
+				} else if (angle == MazeAngle::EAST) {
+					addSingleWall(x, y-1, MazeAngle::WEST);
+				} else if (angle == MazeAngle::SOUTH) {
+					addSingleWall(x-1, y, MazeAngle::NORTH);
+				} else { // WEST
+					addSingleWall(x, y+1, MazeAngle::EAST);
+				}
+			}
+		}
+	}
 	return;
 }
 
@@ -191,6 +248,13 @@ bool Map::hasWatched(int8_t x, int8_t y, MazeAngle angle){
 		return (hasReached(x, y) | hasReached(x-1, y));
 		break;
 	}
+}
+
+void Map::enableAutoInsert() {
+	enabled_autoinsert = true;
+}
+void Map::disableAutoInsert() {
+	enabled_autoinsert = false;
 }
 
 void Map::copyFrom(const Map& m){

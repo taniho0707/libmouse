@@ -19,6 +19,8 @@ private:
 	 * @brief 迷路の競技を指定
 	 */
 	ClassType type;
+
+	bool enabled_autoinsert;
 	
 public:
 	Map();
@@ -109,12 +111,12 @@ public:
 	
 	/**
 	 * @brief マウスから見て壁があるか確認します
-	 * @param x マウスからのx座標
-	 * @param y マウスからのy座標
-	 * @param angle マウスから見た壁の方角
-	 * @param mousex マウスのx座標
-	 * @param mousey マウスのy座標
-	 * @param mouseangle マウスの方角
+	 * @param x マウスのx座標
+	 * @param y マウスのy座標
+	 * @param angle マウスの方角
+	 * @param mousex マウスからのx座標
+	 * @param mousey マウスからのy座標
+	 * @param mouseangle マウスから見た壁の方角
 	 * @return 壁が存在したらtrue
 	 */
 	bool isExistWallFromMouse(int8_t x, int8_t y, MazeAngle angle,
@@ -137,6 +139,9 @@ public:
 	bool hasReached(int8_t, int8_t);
 
 	bool hasWatched(int8_t, int8_t, MazeAngle);
+
+	void enableAutoInsert();
+	void disableAutoInsert();
 
 	void copyFrom(const Map&);
 
