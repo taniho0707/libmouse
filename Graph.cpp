@@ -38,16 +38,21 @@ uint16_t Graph::cnvCoordinateToNum(int16_t x, int16_t y, MazeAngle angle){
 		return 1985;
 	}
 
+	uint16_t ret = 1985;
 	if (angle == MazeAngle::SOUTH) return cnvCoordinateToNum(x, y-1, MazeAngle::NORTH);
 	else if (angle == MazeAngle::WEST) return cnvCoordinateToNum(x-1, y, MazeAngle::EAST);
-	else if (angle == MazeAngle::NORTH) return 63*x + y*2 + 1;
-	else return 63*x + y*2;
+	else if (angle == MazeAngle::NORTH) ret = 63*x + y*2 + 1;
+	else ret = 63*x + y*2;
+	if (ret > 1985) ret = 1985;
+	return ret;
 }
 
 void Graph::cnvNumToCoordinate(uint16_t num, int16_t& x, int16_t& y, MazeAngle& angle){
 	if (num == 1984) {
 		x = 0; y = 0; angle = MazeAngle::SOUTH;
 		return;
+	} else if (num > 1984) {
+		x = 0, y = 0; angle = MazeAngle::SOUTH; /// @todo この返り値でいいの？
 	}
 
 	x = num/63;
@@ -134,13 +139,13 @@ Footmap Graph::cnvGraphToFootmap(const vector<uint16_t>& graph){
 		/// @todo ゴール座標は4か9マス
 		fm.setFootmap(x, y, i);
 		if (x == 0 && y == 0) break;
-		if (fm.getFootmap(x-1, y, 1024) == 0 && ((x-1) != 4 || y != 4)){
+		if (fm.getFootmap(x-1, y, 1024) == 0 && ((x-1) != 5 || y != 5)){
 			x -= 1;
-		} else if (fm.getFootmap(x+1, y, 1024) == 0 && ((x+1) != 4 || y != 4)){
+		} else if (fm.getFootmap(x+1, y, 1024) == 0 && ((x+1) != 5 || y != 5)){
 			x += 1;
-		} else if (fm.getFootmap(x, y-1, 1024) == 0 && (x != 4 || (y-1) != 4)){
+		} else if (fm.getFootmap(x, y-1, 1024) == 0 && (x != 5 || (y-1) != 5)){
 			y -= 1;
-		} else if (fm.getFootmap(x, y+1, 1024) == 0 && (x != 4 || (y+1) != 4)){
+		} else if (fm.getFootmap(x, y+1, 1024) == 0 && (x != 5 || (y+1) != 5)){
 			y += 1;
 		}
 	}
