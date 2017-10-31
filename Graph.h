@@ -42,6 +42,7 @@ public:
 					  uint16_t weight);
 
 	void disconnectNodes(uint16_t node1, uint16_t node2);
+	void disconnectNodes(uint16_t node1);
 
 	uint16_t getCost(int16_t x, int16_t y, MazeAngle angle);
 

@@ -80,8 +80,25 @@ void Graph::connectNodes(int16_t from_x, int16_t from_y, MazeAngle from_angle,
 }
 
 
+/// @todo 動作検証
 void Graph::disconnectNodes(const uint16_t node1, const uint16_t node2){
-	//
+	for (int i=0; i<nodes->at(node1).edges_to.size(); ++i) {
+		if (nodes->at(node1).edges_to.at(i) == node2) {
+			nodes->at(node1).edges_to.erase(nodes->at(node1).edges_to.begin()+i);
+			nodes->at(node1).edges_cost.erase(nodes->at(node1).edges_cost.begin()+i);
+		}
+	}
+	for (int i=0; i<nodes->at(node2).edges_to.size(); ++i) {
+		if (nodes->at(node2).edges_to.at(i) == node1) {
+			nodes->at(node2).edges_to.erase(nodes->at(node1).edges_to.begin()+i);
+			nodes->at(node2).edges_cost.erase(nodes->at(node1).edges_cost.begin()+i);
+		}
+	}
+}
+
+void Graph::disconnectNodes(const uint16_t node1) {
+	nodes->at(node1).edges_to.clear();
+	nodes->at(node1).edges_cost.clear();
 }
 
 
