@@ -19,7 +19,7 @@ MultiplePosition::~MultiplePosition(){
 }
 
 void MultiplePosition::clear(){
-	vector< pair<int16_t, int16_t> >().swap(curs);
+	curs.clear();
 }
 
 void MultiplePosition::add(int16_t x, int16_t y){

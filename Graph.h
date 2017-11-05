@@ -13,6 +13,7 @@
 #include "Node.h"
 #include "Map.h"
 #include "Position.h"
+#include "Walldata.h"
 
 #include "Footmap.h"
 #include "Path.h"
@@ -43,6 +44,7 @@ public:
 
 	void disconnectNodes(uint16_t node1, uint16_t node2);
 	void disconnectNodes(uint16_t node1);
+	void disconnectNodesFromWalldata(int16_t x, int16_t y, MazeAngle a, Walldata wall);
 
 	uint16_t getCost(int16_t x, int16_t y, MazeAngle angle);
 

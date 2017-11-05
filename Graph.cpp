@@ -90,15 +90,33 @@ void Graph::disconnectNodes(const uint16_t node1, const uint16_t node2){
 	}
 	for (int i=0; i<nodes->at(node2).edges_to.size(); ++i) {
 		if (nodes->at(node2).edges_to.at(i) == node1) {
-			nodes->at(node2).edges_to.erase(nodes->at(node1).edges_to.begin()+i);
-			nodes->at(node2).edges_cost.erase(nodes->at(node1).edges_cost.begin()+i);
+			nodes->at(node2).edges_to.erase(nodes->at(node2).edges_to.begin()+i);
+			nodes->at(node2).edges_cost.erase(nodes->at(node2).edges_cost.begin()+i);
 		}
 	}
 }
 
 void Graph::disconnectNodes(const uint16_t node1) {
+	int node2 = 1985;
+	for (int j=0; j<nodes->at(node1).edges_to.size(); ++j) {
+		node2 = nodes->at(node1).edges_to.at(j);
+		for (int i=0; i<nodes->at(node2).edges_to.size(); ++i) {
+			if (nodes->at(node2).edges_to.at(i) == node1) {
+				nodes->at(node2).edges_to.erase(nodes->at(node2).edges_to.begin()+i);
+				nodes->at(node2).edges_cost.erase(nodes->at(node2).edges_cost.begin()+i);
+			}
+		}
+	}
 	nodes->at(node1).edges_to.clear();
 	nodes->at(node1).edges_cost.clear();
+}
+
+void Graph::disconnectNodesFromWalldata(int16_t x, int16_t y, MazeAngle a, Walldata wall) {
+	Walldata walldata = Walldata::rotateWallToAbsolute(wall, a);
+	if (walldata.isExistWall(MouseAngle::FRONT)) disconnectNodes(cnvCoordinateToNum(x, y, MazeAngle::NORTH));
+	if (walldata.isExistWall(MouseAngle::RIGHT)) disconnectNodes(cnvCoordinateToNum(x, y, MazeAngle::EAST));
+	if (walldata.isExistWall(MouseAngle::BACK)) disconnectNodes(cnvCoordinateToNum(x, y, MazeAngle::SOUTH));
+	if (walldata.isExistWall(MouseAngle::LEFT)) disconnectNodes(cnvCoordinateToNum(x, y, MazeAngle::WEST));
 }
 
 
