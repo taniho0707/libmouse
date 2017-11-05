@@ -11,7 +11,7 @@ C_DEFS =  \
 -D__FPU_PRESENT -DARM_MATH_CM4
 C_INCLUDES = 
 CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections \
--fmessage-length=0 -fexceptions -fno-rtti -funsigned-char -fpermissive -fno-use-cxa-atexit -std=c++14 -Wno-narrowing -Wl,--gc-sections
+-fmessage-length=0 -fexceptions -fno-rtti -funsigned-char -fpermissive -fno-use-cxa-atexit -std=c++14 -Wno-narrowing -Wl,--gc-sections -Og
 
 BINPATH = /usr/bin
 CC = $(BINPATH)/$(PREFIX)g++

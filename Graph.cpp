@@ -293,7 +293,8 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 			uint16_t to = node_done->edges_to.at(i);
 			uint16_t cost = node_done->edges_cost.at(i) + node_done->cost;
 			uint16_t from = node_done->num;
-			while (true) {
+			int j=0;
+			while (j++ < 30) {
 				if (cost < nodes->at(to).cost) {
 					nodes->at(to).cost = cost;
 					nodes->at(to).from = from;
