@@ -299,7 +299,6 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 					nodes->at(to).cost = cost;
 					nodes->at(to).from = from;
 					q.push(&nodes->at(to));
-					cout << from << " -> " << to << endl;
 				}
 
 				if (!nodes->at(to).isConnected(getNextNodeStraight(from, nodes->at(to).num))) {
