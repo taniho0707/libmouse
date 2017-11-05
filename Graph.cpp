@@ -32,10 +32,16 @@ Graph::~Graph(){
 uint16_t Graph::cnvCoordinateToNum(int16_t x, int16_t y, MazeAngle angle){
 	if (x == 0 && y == 0 && angle == MazeAngle::SOUTH) return 1984;
 	if (x > 31 || x < 0 || y > 31 || y < 0
-		|| (angle == MazeAngle::NORTH && x == 31)
-		|| (angle == MazeAngle::EAST && y == 31)
+		|| (angle == MazeAngle::NORTH && y == 31)
+		|| (angle == MazeAngle::EAST && x == 31)
 		) {
 		return 1985;
+	}
+
+	if (x == 31 && angle == MazeAngle::NORTH) {
+		return (1953 + y);
+	} else if (x == 31 && angle == MazeAngle::SOUTH) {
+		return (1953 + y - 1);
 	}
 
 	uint16_t ret = 1985;
@@ -43,7 +49,7 @@ uint16_t Graph::cnvCoordinateToNum(int16_t x, int16_t y, MazeAngle angle){
 	else if (angle == MazeAngle::WEST) return cnvCoordinateToNum(x-1, y, MazeAngle::EAST);
 	else if (angle == MazeAngle::NORTH) ret = 63*x + y*2 + 1;
 	else ret = 63*x + y*2;
-	if (ret > 1985) ret = 1985;
+	if (ret >= 1985) ret = 1985;
 	return ret;
 }
 
@@ -52,7 +58,11 @@ void Graph::cnvNumToCoordinate(uint16_t num, int16_t& x, int16_t& y, MazeAngle& 
 		x = 0; y = 0; angle = MazeAngle::SOUTH;
 		return;
 	} else if (num > 1984) {
-		x = 0, y = 0; angle = MazeAngle::SOUTH; /// @todo この返り値でいいの？
+		x = 0; y = 0; angle = MazeAngle::SOUTH; /// @todo この返り値でいいの？
+		return;
+	} else if (num >= 1953) {
+		x = 31; y = num-1953; angle = MazeAngle::NORTH;
+		return;
 	}
 
 	x = num/63;
@@ -62,6 +72,31 @@ void Graph::cnvNumToCoordinate(uint16_t num, int16_t& x, int16_t& y, MazeAngle& 
 	} else {
 		angle = MazeAngle::NORTH;
 		y = (num%63-1)/2;
+	}
+}
+
+void Graph::cnvNumToPosition(uint16_t num, float& x, float& y) {
+	/// @todo ハーフサイズにしか対応していない
+	if (num == 1984) {
+		x = 0.045f;
+		y = 0.0f;
+		return;
+	}
+	if (num >= 1985) {
+		x = 10.0f;
+		y = 10.0f;
+		return;
+	}
+
+	int16_t coor_x, coor_y;
+	MazeAngle coor_a;
+	cnvNumToCoordinate(num, coor_x, coor_y, coor_a);
+	if (coor_a == MazeAngle::NORTH) {
+		x = 0.09 * coor_x + 0.045;
+		y = 0.09 * (coor_y + 1);
+	} else { // coor_a == MazeAngle::EAST
+		x = 0.09 * (coor_x + 1);
+		y = 0.09 * coor_y + 0.045;
 	}
 }
 
@@ -122,7 +157,7 @@ void Graph::disconnectNodesFromWalldata(int16_t x, int16_t y, MazeAngle a, Walld
 
 uint16_t Graph::getCost(int16_t x, int16_t y, MazeAngle angle){
 	uint16_t num = cnvCoordinateToNum(x, y, angle);
-	if (num > 1985) return Node::MAX;
+	if (num >= 1985) return Node::MAX;
 	return nodes->at(num).cost;
 }
 
@@ -148,21 +183,39 @@ uint16_t Graph::getNextNodeStraight(uint16_t from, uint16_t current) {
 void Graph::connectWithMap(Map& map, bool enable_unwatched){
 	saved_map = map;
 	connectNodes(0, 0, MazeAngle::SOUTH, 0, 0, MazeAngle::NORTH, WEIGHT_STRAIGHT);
-	for (int i=0; i<31; ++i) {
+	for (int i=0; i<32; ++i) {
 		for (int j=0; j<31; ++j) {
 			if (!map.isExistWall(i, j, MazeAngle::NORTH)) {
-				if ((!map.isExistWall(i, j+1, MazeAngle::EAST )) && (enable_unwatched || map.hasWatched(i, j+1, MazeAngle::EAST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::EAST, WEIGHT_DIAGO);
-				if ((!map.isExistWall(i, j+1, MazeAngle::NORTH)) && (enable_unwatched || map.hasWatched(i, j+1, MazeAngle::NORTH))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::NORTH, WEIGHT_STRAIGHT);
-				if ((!map.isExistWall(i, j+1, MazeAngle::WEST )) && (enable_unwatched || map.hasWatched(i, j+1, MazeAngle::WEST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::WEST, WEIGHT_DIAGO);
-				if ((!map.isExistWall(i, j,   MazeAngle::EAST )) && (enable_unwatched || map.hasWatched(i, j  , MazeAngle::EAST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::EAST, WEIGHT_DIAGO);
-				if ((!map.isExistWall(i, j,   MazeAngle::WEST )) && (enable_unwatched || map.hasWatched(i, j  , MazeAngle::WEST))) connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::WEST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j+1, MazeAngle::EAST ))
+					&& (enable_unwatched || map.hasWatched(i, j+1, MazeAngle::EAST))
+					)
+					connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::EAST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j+1, MazeAngle::NORTH))
+					&& (enable_unwatched || map.hasWatched(i, j+1, MazeAngle::NORTH))
+					)
+					connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::NORTH, WEIGHT_STRAIGHT);
+				if ((!map.isExistWall(i, j+1, MazeAngle::WEST ))
+					&& (enable_unwatched || map.hasWatched(i, j+1, MazeAngle::WEST))
+					)
+					connectNodes(i, j+1, MazeAngle::SOUTH, i, j+1, MazeAngle::WEST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j,   MazeAngle::EAST ))
+					&& (enable_unwatched || map.hasWatched(i, j  , MazeAngle::EAST))
+					)
+					connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::EAST, WEIGHT_DIAGO);
+				if ((!map.isExistWall(i, j,   MazeAngle::WEST ))
+					&& (enable_unwatched || map.hasWatched(i, j  , MazeAngle::WEST))
+					)
+					connectNodes(i, j+1, MazeAngle::SOUTH, i, j, MazeAngle::WEST, WEIGHT_DIAGO);
 			}
 		}
 	}
 	for (int i=0; i<30; ++i) {
 		for (int j=0; j<32; ++j) {
 			if (!map.isExistWall(i, j, MazeAngle::EAST)) {
-				if ((!map.isExistWall(i+1, j, MazeAngle::EAST)) && (enable_unwatched || map.hasWatched(i+1, j, MazeAngle::EAST))) connectNodes(i, j, MazeAngle::EAST, i+1, j, MazeAngle::EAST, WEIGHT_STRAIGHT);
+				if ((!map.isExistWall(i+1, j, MazeAngle::EAST))
+					&& (enable_unwatched || map.hasWatched(i+1, j, MazeAngle::EAST))
+					)
+					connectNodes(i, j, MazeAngle::EAST, i+1, j, MazeAngle::EAST, WEIGHT_STRAIGHT);
 			}
 		}
 	}

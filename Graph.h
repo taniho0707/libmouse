@@ -34,6 +34,7 @@ public:
 
 	static uint16_t cnvCoordinateToNum(int16_t x, int16_t y, MazeAngle angle);
 	static void cnvNumToCoordinate(uint16_t num, int16_t& x, int16_t& y, MazeAngle& angle);
+	static void cnvNumToPosition(uint16_t num, float& x, float& y);
 
 	uint16_t getNextNodeStraight(uint16_t from, uint16_t current);
 
