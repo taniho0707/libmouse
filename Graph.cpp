@@ -166,11 +166,27 @@ uint16_t Graph::getNextNodeStraight(uint16_t from, uint16_t current) {
 	int16_t s_from = static_cast<int16_t>(from);
 	int16_t s_current = static_cast<int16_t>(current);
 	int16_t s_ret;
+	int16_t dif = s_current - s_from;
+	int16_t from_x, from_y, current_x, current_y;
+	MazeAngle from_a, current_a;
+	cnvNumToCoordinate(from, from_x, from_y, from_a);
+	cnvNumToCoordinate(current, current_x, current_y, current_a);
 
+	if (abs(dif) == 62) {
+		dif = -1 * (dif/abs(dif));
+	} else if(abs(dif) == 64) {
+		dif = (dif/abs(dif));
+	} else if(abs(dif) == 1) {
+		if (from_x == current_x && from_y == current_y) {
+			dif = -62 * (dif/abs(dif));
+		} else {
+			dif = 64 * (dif/abs(dif));
+		}
+	}
 	if (from == 3 && current == 1) {
 		s_ret = 1984;
 	} else {
-		s_ret = s_current + (s_current - s_from);
+		s_ret = s_current + dif;
 	}
 
 	if (s_ret < 0 || s_ret > 1984) {
@@ -282,14 +298,16 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 					nodes->at(to).cost = cost;
 					nodes->at(to).from = from;
 					q.push(&nodes->at(to));
+					cout << from << " -> " << to << endl;
 				}
 
 				if (!nodes->at(to).isConnected(getNextNodeStraight(from, nodes->at(to).num))) {
 					break;
 				} else {
-					cost = node_done->edges_cost.at(i) - 10 + nodes->at(to).cost; /// @todo 適当な値を減算しているけど適当すぎてポ！！！
-					from = nodes->at(to).num;
+					Node* node_next = &nodes->at(to);
 					to = getNextNodeStraight(from, nodes->at(to).num);
+					cost = node_done->edges_cost.at(i) + node_next->cost - 10; /// @todo 適当な値を減算しているけど適当すぎてポ！！！
+					from = node_next->num;
 				}
 			}
 		}
