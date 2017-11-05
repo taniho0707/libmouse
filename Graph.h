@@ -35,6 +35,8 @@ public:
 	static uint16_t cnvCoordinateToNum(int16_t x, int16_t y, MazeAngle angle);
 	static void cnvNumToCoordinate(uint16_t num, int16_t& x, int16_t& y, MazeAngle& angle);
 
+	uint16_t getNextNodeStraight(uint16_t from, uint16_t current);
+
 	void connectWithMap(Map& map, bool enable_unwatched = false);
 
 	void connectNodes(uint16_t node1, uint16_t node2, uint16_t weight);

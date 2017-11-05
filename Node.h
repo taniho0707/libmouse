@@ -25,7 +25,7 @@ public:
 	Node(uint16_t n);
 	
 	/* std::vector<uint16_t> getConnectedNodes(); */
-	/* bool isConnected(uint16_t num); */
+	bool isConnected(uint16_t num);
 	/* uint16_t getCost(uint16_t num); */
 
 	bool operator< (const Node& input) const;

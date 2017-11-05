@@ -13,9 +13,14 @@ Node::~Node(){}
 	
 // }
 
-// bool Node::isConnected(uint16_t num){
-	
-// }
+bool Node::isConnected(uint16_t num){
+	for (int i=0; i<edges_to.size(); ++i) {
+		if (edges_to.at(i) == num) {
+			return true;
+		}
+	}
+	return false;
+}
 
 // uint16_t Node::getCost(uint16_t num){
 	

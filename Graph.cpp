@@ -127,6 +127,24 @@ uint16_t Graph::getCost(int16_t x, int16_t y, MazeAngle angle){
 }
 
 
+uint16_t Graph::getNextNodeStraight(uint16_t from, uint16_t current) {
+	int16_t s_from = static_cast<int16_t>(from);
+	int16_t s_current = static_cast<int16_t>(current);
+	int16_t s_ret;
+
+	if (from == 3 && current == 1) {
+		s_ret = 1984;
+	} else {
+		s_ret = s_current + (s_current - s_from);
+	}
+
+	if (s_ret < 0 || s_ret > 1984) {
+		s_ret = 1985;
+	}
+	return static_cast<uint16_t>(s_ret);
+}
+
+
 void Graph::connectWithMap(Map& map, bool enable_unwatched){
 	saved_map = map;
 	connectNodes(0, 0, MazeAngle::SOUTH, 0, 0, MazeAngle::NORTH, WEIGHT_STRAIGHT);
@@ -206,10 +224,20 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 			uint16_t to = node_done->edges_to.at(i);
 			uint16_t cost = node_done->edges_cost.at(i) + node_done->cost;
 			uint16_t from = node_done->num;
-			if (cost < nodes->at(to).cost) {
-				nodes->at(to).cost = cost;
-				nodes->at(to).from = from;
-				q.push(&nodes->at(to));
+			while (true) {
+				if (cost < nodes->at(to).cost) {
+					nodes->at(to).cost = cost;
+					nodes->at(to).from = from;
+					q.push(&nodes->at(to));
+				}
+
+				if (!nodes->at(to).isConnected(getNextNodeStraight(from, nodes->at(to).num))) {
+					break;
+				} else {
+					cost = node_done->edges_cost.at(i) - 10 + nodes->at(to).cost; /// @todo 適当な値を減算しているけど適当すぎてポ！！！
+					from = nodes->at(to).num;
+					to = getNextNodeStraight(from, nodes->at(to).num);
+				}
 			}
 		}
 	}
