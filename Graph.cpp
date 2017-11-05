@@ -28,6 +28,16 @@ Graph::~Graph(){
 }
 
 
+void Graph::resetCosts() {
+	for (int i=0; i<(1984+2); ++i) {
+		if (nodes->at(i).done) {
+			nodes->at(i).cost = Node::MAX;
+			nodes->at(i).from = 1985;
+			nodes->at(i).done = false;
+		}
+	}
+}
+
 /// @todo 範囲外アクセスしないようにあれこれする
 uint16_t Graph::cnvCoordinateToNum(int16_t x, int16_t y, MazeAngle angle){
 	if (x == 0 && y == 0 && angle == MazeAngle::SOUTH) return 1984;
@@ -281,6 +291,7 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 	};
 	priority_queue<Node*, vector<Node*>, decltype(comparator) > q(comparator);
 
+	resetCosts();
 	nodes->at(start).cost = 0;
 	q.push(&nodes->at(start));
 
@@ -293,8 +304,7 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 			uint16_t to = node_done->edges_to.at(i);
 			uint16_t cost = node_done->edges_cost.at(i) + node_done->cost;
 			uint16_t from = node_done->num;
-			int j=0;
-			while (j++ < 30) {
+			while (true) {
 				if (cost < nodes->at(to).cost) {
 					nodes->at(to).cost = cost;
 					nodes->at(to).from = from;

@@ -36,6 +36,8 @@ public:
 	static void cnvNumToCoordinate(uint16_t num, int16_t& x, int16_t& y, MazeAngle& angle);
 	static void cnvNumToPosition(uint16_t num, float& x, float& y);
 
+	void resetCosts();
+
 	uint16_t getNextNodeStraight(uint16_t from, uint16_t current);
 
 	void connectWithMap(Map& map, bool enable_unwatched = false);
