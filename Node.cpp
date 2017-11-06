@@ -1,8 +1,6 @@
 #include "Node.h"
 
 Node::Node(uint16_t n){
-	done = false;
-	cost = MAX;
 	from = MAX;
 	num = n;
 }
@@ -26,23 +24,21 @@ bool Node::isConnected(uint16_t num){
 	
 // }
 
-bool Node::operator< (const Node& input) const{
-	if (cost < input.cost) return true;
-	else return false;
+void Node::pushCost(uint16_t num) {
+	for (int i=0; i<6; ++i) {
+		if (edges_cost.at(i) == MAX) {
+			edges_cost.at(i) = num;
+			return;
+		}
+	}
 }
 
-bool Node::operator> (const Node& input) const{
-	if (cost > input.cost) return true;
-	else return false;
-}
-
-bool Node::operator< (const Node* input) const{
-	if (cost < input->cost) return true;
-	else return false;
-}
-
-bool Node::operator> (const Node* input) const{
-	if (cost > input->cost) return true;
-	else return false;
+void Node::pushTo(uint16_t num) {
+	for (int i=0; i<6; ++i) {
+		if (edges_to.at(i) == MAX) {
+			edges_to.at(i) = num;
+			return;
+		}
+	}
 }
 

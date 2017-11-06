@@ -6,36 +6,23 @@ Graph::Graph() :
 	WEIGHT_STRAIGHT(90),
 	WEIGHT_DIAGO(63)
 {
-	nodes = new std::vector<Node>;
-	nodes->reserve(1984+2);
+	nodes = new std::array<Node*, 1986>;
 	for (int i=0; i<(1984+2); ++i) {
-		nodes->push_back(Node(i));
-	}
-}
-Graph::Graph(uint16_t num) :
-	WEIGHT_STRAIGHT(90),
-	WEIGHT_DIAGO(63)
-{
-	nodes = new std::vector<Node>;
-	nodes->reserve(num);
-	for (int i=0; i<num; ++i) {
-		nodes->push_back(Node(i));
+		nodes->at(i) = new Node(i);
 	}
 }
 
 Graph::~Graph(){
+	for (int i=0; i<(1984+2); ++i) {
+		delete nodes->at(i);
+	}
 	delete nodes;
 }
 
 
 void Graph::resetCosts() {
-	for (int i=0; i<(1984+2); ++i) {
-		if (nodes->at(i).done) {
-			nodes->at(i).cost = Node::MAX;
-			nodes->at(i).from = 1985;
-			nodes->at(i).done = false;
-		}
-	}
+	dij_done &= 0;
+	dij_cost.fill(Node::MAX);
 }
 
 /// @todo 範囲外アクセスしないようにあれこれする
@@ -113,10 +100,10 @@ void Graph::cnvNumToPosition(uint16_t num, float& x, float& y) {
 
 void Graph::connectNodes(const uint16_t node1, const uint16_t node2, const uint16_t weight){
 	if (node1 >= 1985 || node2 >= 1985) return;
-	nodes->at(node1).edges_to.push_back(node2);
-	nodes->at(node1).edges_cost.push_back(weight);
-	nodes->at(node2).edges_to.push_back(node1);
-	nodes->at(node2).edges_cost.push_back(weight);
+	nodes->at(node1)->pushTo(node2);
+	nodes->at(node1)->pushCost(weight);
+	nodes->at(node2)->pushTo(node1);
+	nodes->at(node2)->pushCost(weight);
 }
 void Graph::connectNodes(int16_t from_x, int16_t from_y, MazeAngle from_angle,
 						 int16_t to_x, int16_t to_y, MazeAngle to_angle,
@@ -127,33 +114,33 @@ void Graph::connectNodes(int16_t from_x, int16_t from_y, MazeAngle from_angle,
 
 /// @todo 動作検証
 void Graph::disconnectNodes(const uint16_t node1, const uint16_t node2){
-	for (int i=0; i<nodes->at(node1).edges_to.size(); ++i) {
-		if (nodes->at(node1).edges_to.at(i) == node2) {
-			nodes->at(node1).edges_to.erase(nodes->at(node1).edges_to.begin()+i);
-			nodes->at(node1).edges_cost.erase(nodes->at(node1).edges_cost.begin()+i);
+	for (int i=0; i<nodes->at(node1)->edges_to.size(); ++i) {
+		if (nodes->at(node1)->edges_to.at(i) == node2) {
+			nodes->at(node1)->edges_to.at(i) = Node::MAX;
+			nodes->at(node1)->edges_cost.at(i) = Node::MAX;
 		}
 	}
-	for (int i=0; i<nodes->at(node2).edges_to.size(); ++i) {
-		if (nodes->at(node2).edges_to.at(i) == node1) {
-			nodes->at(node2).edges_to.erase(nodes->at(node2).edges_to.begin()+i);
-			nodes->at(node2).edges_cost.erase(nodes->at(node2).edges_cost.begin()+i);
+	for (int i=0; i<nodes->at(node2)->edges_to.size(); ++i) {
+		if (nodes->at(node2)->edges_to.at(i) == node1) {
+			nodes->at(node2)->edges_to.at(i) = Node::MAX;
+			nodes->at(node2)->edges_cost.at(i) = Node::MAX;
 		}
 	}
 }
 
 void Graph::disconnectNodes(const uint16_t node1) {
 	int node2 = 1985;
-	for (int j=0; j<nodes->at(node1).edges_to.size(); ++j) {
-		node2 = nodes->at(node1).edges_to.at(j);
-		for (int i=0; i<nodes->at(node2).edges_to.size(); ++i) {
-			if (nodes->at(node2).edges_to.at(i) == node1) {
-				nodes->at(node2).edges_to.erase(nodes->at(node2).edges_to.begin()+i);
-				nodes->at(node2).edges_cost.erase(nodes->at(node2).edges_cost.begin()+i);
+	for (int j=0; j<nodes->at(node1)->edges_to.size(); ++j) {
+		node2 = nodes->at(node1)->edges_to.at(j);
+		for (int i=0; i<nodes->at(node2)->edges_to.size(); ++i) {
+			if (nodes->at(node2)->edges_to.at(i) == node1) {
+				nodes->at(node2)->edges_to.at(i) = Node::MAX;
+				nodes->at(node2)->edges_cost.at(i) = Node::MAX;
 			}
 		}
 	}
-	nodes->at(node1).edges_to.clear();
-	nodes->at(node1).edges_cost.clear();
+	nodes->at(node1)->edges_to.fill(Node::MAX);
+	nodes->at(node1)->edges_cost.fill(Node::MAX);
 }
 
 void Graph::disconnectNodesFromWalldata(int16_t x, int16_t y, MazeAngle a, Walldata wall) {
@@ -162,13 +149,6 @@ void Graph::disconnectNodesFromWalldata(int16_t x, int16_t y, MazeAngle a, Walld
 	if (walldata.isExistWall(MouseAngle::RIGHT)) disconnectNodes(cnvCoordinateToNum(x, y, MazeAngle::EAST));
 	if (walldata.isExistWall(MouseAngle::BACK)) disconnectNodes(cnvCoordinateToNum(x, y, MazeAngle::SOUTH));
 	if (walldata.isExistWall(MouseAngle::LEFT)) disconnectNodes(cnvCoordinateToNum(x, y, MazeAngle::WEST));
-}
-
-
-uint16_t Graph::getCost(int16_t x, int16_t y, MazeAngle angle){
-	uint16_t num = cnvCoordinateToNum(x, y, angle);
-	if (num >= 1985) return Node::MAX;
-	return nodes->at(num).cost;
 }
 
 
@@ -255,7 +235,7 @@ Footmap Graph::cnvGraphToFootmap(const vector<uint16_t>& graph){
 	MazeAngle a = MazeAngle::EAST;
 	Footmap fm;
 	for (int i=graph.size()-1; i>=0; --i) {
-		if (nodes->at(graph.at(i)).cost != 0){
+		if (dij_cost.at(graph.at(i)) != 0){
 			Graph::cnvNumToCoordinate(graph.at(i), x, y, a);
 			if (a == MazeAngle::EAST) {
 				fm.setFootmap(x, y, 0);
@@ -286,37 +266,37 @@ Footmap Graph::cnvGraphToFootmap(const vector<uint16_t>& graph){
 
 
 vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
-	auto comparator = [](Node* left, Node* right){
-		return left->cost > right->cost;
+	auto comparator = [this](Node* left, Node* right){
+		return dij_cost.at(left->num) > dij_cost.at(right->num);
 	};
 	priority_queue<Node*, vector<Node*>, decltype(comparator) > q(comparator);
 
 	resetCosts();
-	nodes->at(start).cost = 0;
-	q.push(&nodes->at(start));
+	dij_cost.at(start) = 0;
+	q.push(nodes->at(start));
 
 	while (!q.empty()) {
 		Node* node_done = q.top(); q.pop();
-		if (node_done->done) continue;
-		node_done->done = true;
+		if (dij_done.test(node_done->num)) continue;
+		dij_done.set(node_done->num);
 
 		for (uint16_t i=0; i<node_done->edges_to.size(); ++i) {
-			uint16_t to = node_done->edges_to.at(i);
-			uint16_t cost = node_done->edges_cost.at(i) + node_done->cost;
 			uint16_t from = node_done->num;
+			uint16_t to = node_done->edges_to.at(i);
+			uint16_t cost = node_done->edges_cost.at(i) + dij_cost.at(from);
 			while (true) {
-				if (cost < nodes->at(to).cost) {
-					nodes->at(to).cost = cost;
-					nodes->at(to).from = from;
-					q.push(&nodes->at(to));
+				if (cost < dij_cost.at(to)) {
+					dij_cost.at(to) = cost;
+					nodes->at(to)->from = from;
+					q.push(nodes->at(to));
 				}
 
-				if (!nodes->at(to).isConnected(getNextNodeStraight(from, nodes->at(to).num))) {
+				if (!nodes->at(to)->isConnected(getNextNodeStraight(from, nodes->at(to)->num))) {
 					break;
 				} else {
-					Node* node_next = &nodes->at(to);
-					to = getNextNodeStraight(from, nodes->at(to).num);
-					cost = node_done->edges_cost.at(i) + node_next->cost - 10; /// @todo 適当な値を減算しているけど適当すぎてポ！！！
+					Node* node_next = nodes->at(to);
+					to = getNextNodeStraight(from, nodes->at(to)->num);
+					cost = node_done->edges_cost.at(i) + dij_cost.at(node_next->num) - 10; /// @todo 適当な値を減算しているけど適当すぎてポ！！！
 					from = node_next->num;
 				}
 			}
@@ -325,12 +305,12 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 
 	vector<uint16_t> ret;
 	Node* node_ret;
-	node_ret = &nodes->at(end);
-	if (node_ret->cost != Node::MAX) {
+	node_ret = nodes->at(end);
+	if (dij_cost.at(node_ret->num) != Node::MAX) {
 		int i=0;
-		while(node_ret->cost != 0 && i++ < 300) { /// @todo 300はてきとう
+		while(dij_cost.at(node_ret->num) != 0 && i++ < 300) { /// @todo 300はてきとう
 			ret.push_back(node_ret->num);
-			node_ret = &nodes->at(node_ret->from);
+			node_ret = nodes->at(node_ret->from);
 		}
 	}
 	

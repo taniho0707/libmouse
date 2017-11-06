@@ -24,12 +24,14 @@ private:
 	const uint16_t WEIGHT_DIAGO;
 
 	Map saved_map;
-	
+
+	std::array<uint16_t, 1986> dij_cost;
+	std::bitset<1986> dij_done;
+
 public:
-	std::vector<Node>* nodes;
+	std::array<Node*, 1986>* nodes;
 
 	Graph();
-	Graph(uint16_t num);
 	~Graph();
 
 	static uint16_t cnvCoordinateToNum(int16_t x, int16_t y, MazeAngle angle);
@@ -50,8 +52,6 @@ public:
 	void disconnectNodes(uint16_t node1, uint16_t node2);
 	void disconnectNodes(uint16_t node1);
 	void disconnectNodesFromWalldata(int16_t x, int16_t y, MazeAngle a, Walldata wall);
-
-	uint16_t getCost(int16_t x, int16_t y, MazeAngle angle);
 
 	Footmap cnvGraphToFootmap(const std::vector<uint16_t>&);
 
