@@ -3,6 +3,10 @@
 Node::Node(uint16_t n){
 	from = MAX;
 	num = n;
+	for (int i=0; i<6; ++i) {
+		edges_to.at(i) = MAX;
+		edges_cost.at(i) = MAX;
+	}
 }
 
 Node::~Node(){}

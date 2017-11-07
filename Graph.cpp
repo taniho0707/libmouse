@@ -10,6 +10,7 @@ Graph::Graph() :
 	for (int i=0; i<(1984+2); ++i) {
 		nodes->at(i) = new Node(i);
 	}
+	resetCosts();
 }
 
 Graph::~Graph(){
@@ -22,7 +23,7 @@ Graph::~Graph(){
 
 void Graph::resetCosts() {
 	dij_done &= 0;
-	dij_cost.fill(Node::MAX);
+	dij_cost.fill(MAX);
 }
 
 /// @todo 範囲外アクセスしないようにあれこれする
@@ -116,14 +117,14 @@ void Graph::connectNodes(int16_t from_x, int16_t from_y, MazeAngle from_angle,
 void Graph::disconnectNodes(const uint16_t node1, const uint16_t node2){
 	for (int i=0; i<nodes->at(node1)->edges_to.size(); ++i) {
 		if (nodes->at(node1)->edges_to.at(i) == node2) {
-			nodes->at(node1)->edges_to.at(i) = Node::MAX;
-			nodes->at(node1)->edges_cost.at(i) = Node::MAX;
+			nodes->at(node1)->edges_to.at(i) = MAX;
+			nodes->at(node1)->edges_cost.at(i) = MAX;
 		}
 	}
 	for (int i=0; i<nodes->at(node2)->edges_to.size(); ++i) {
 		if (nodes->at(node2)->edges_to.at(i) == node1) {
-			nodes->at(node2)->edges_to.at(i) = Node::MAX;
-			nodes->at(node2)->edges_cost.at(i) = Node::MAX;
+			nodes->at(node2)->edges_to.at(i) = MAX;
+			nodes->at(node2)->edges_cost.at(i) = MAX;
 		}
 	}
 }
@@ -134,13 +135,13 @@ void Graph::disconnectNodes(const uint16_t node1) {
 		node2 = nodes->at(node1)->edges_to.at(j);
 		for (int i=0; i<nodes->at(node2)->edges_to.size(); ++i) {
 			if (nodes->at(node2)->edges_to.at(i) == node1) {
-				nodes->at(node2)->edges_to.at(i) = Node::MAX;
-				nodes->at(node2)->edges_cost.at(i) = Node::MAX;
+				nodes->at(node2)->edges_to.at(i) = MAX;
+				nodes->at(node2)->edges_cost.at(i) = MAX;
 			}
 		}
 	}
-	nodes->at(node1)->edges_to.fill(Node::MAX);
-	nodes->at(node1)->edges_cost.fill(Node::MAX);
+	nodes->at(node1)->edges_to.fill(MAX);
+	nodes->at(node1)->edges_cost.fill(MAX);
 }
 
 void Graph::disconnectNodesFromWalldata(int16_t x, int16_t y, MazeAngle a, Walldata wall) {
@@ -281,6 +282,7 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 		dij_done.set(node_done->num);
 
 		for (uint16_t i=0; i<node_done->edges_to.size(); ++i) {
+			if (node_done->edges_to.at(i) == Node::MAX) continue;
 			uint16_t from = node_done->num;
 			uint16_t to = node_done->edges_to.at(i);
 			uint16_t cost = node_done->edges_cost.at(i) + dij_cost.at(from);
@@ -306,7 +308,7 @@ vector<uint16_t> Graph::dijkstra(uint16_t start, uint16_t end){
 	vector<uint16_t> ret;
 	Node* node_ret;
 	node_ret = nodes->at(end);
-	if (dij_cost.at(node_ret->num) != Node::MAX) {
+	if (dij_cost.at(node_ret->num) != MAX) {
 		int i=0;
 		while(dij_cost.at(node_ret->num) != 0 && i++ < 300) { /// @todo 300はてきとう
 			ret.push_back(node_ret->num);

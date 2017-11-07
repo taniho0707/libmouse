@@ -20,15 +20,17 @@
 
 class Graph{
 private:
+	const uint16_t MAX = 65535;
+
 	const uint16_t WEIGHT_STRAIGHT;
 	const uint16_t WEIGHT_DIAGO;
 
 	Map saved_map;
 
+public:
 	std::array<uint16_t, 1986> dij_cost;
 	std::bitset<1986> dij_done;
 
-public:
 	std::array<Node*, 1986>* nodes;
 
 	Graph();
