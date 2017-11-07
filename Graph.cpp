@@ -133,6 +133,7 @@ void Graph::disconnectNodes(const uint16_t node1) {
 	int node2 = 1985;
 	for (int j=0; j<nodes->at(node1)->edges_to.size(); ++j) {
 		node2 = nodes->at(node1)->edges_to.at(j);
+		if (node2 == MAX) continue;
 		for (int i=0; i<nodes->at(node2)->edges_to.size(); ++i) {
 			if (nodes->at(node2)->edges_to.at(i) == node1) {
 				nodes->at(node2)->edges_to.at(i) = MAX;
